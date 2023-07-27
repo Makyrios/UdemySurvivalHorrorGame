@@ -8,6 +8,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
+class IGrabbable;
 
 UCLASS()
 class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
@@ -39,15 +40,24 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* InteractAction;
 
+	/** Grab Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* GrabAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
 
 private:
+	FVector2D LookAxis;
+	IGrabbable* GrabbedActor;
+
 	//* Input *//
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Interact();
+	void StartGrab();
+	void StopGrab();
 
 
 	AActor* LineTrace(float Length);
@@ -71,4 +81,5 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	FORCEINLINE FVector2D GetLookAxis() const { return LookAxis; }
 };

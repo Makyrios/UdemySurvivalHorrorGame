@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "HG_PlayerController.h"
+#include "Grabbable.h"
 
 
 // Sets default values
@@ -57,6 +58,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::Interact);
 
+		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APlayerCharacter::StartGrab);
+		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopGrab);
+
 	}
 }
 
@@ -88,6 +92,8 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
+	LookAxis = LookAxisVector;
+
 	if (Controller != nullptr)
 	{
 		AddControllerYawInput(LookAxisVector.X);
@@ -101,6 +107,25 @@ void APlayerCharacter::Interact()
 	if (IInteractable* InteractActor = Cast<IInteractable>(HitActor))
 	{
 		InteractActor->Interact();
+	}
+}
+
+void APlayerCharacter::StartGrab()
+{
+	AActor* HitActor = LineTrace(TraceLength);
+	if (IGrabbable* InteractActor = Cast<IGrabbable>(HitActor))
+	{
+		GrabbedActor = InteractActor;
+		InteractActor->Grab();
+	}
+}
+
+void APlayerCharacter::StopGrab()
+{
+	if (GrabbedActor != nullptr)
+	{
+		GrabbedActor->Release();
+		GrabbedActor = nullptr;
 	}
 }
 
