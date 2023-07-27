@@ -15,9 +15,6 @@ class UDEMYHORRORGAME_API AInteractionActor_Door : public AInteractionActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, Category = Timeline)
-	UTimelineComponent* TimelineComponent;
-
 	UPROPERTY(EditAnywhere, Category = Timeline)
 	UCurveFloat* DoorCurveFloat;
 
@@ -34,10 +31,13 @@ protected:
 public:
 	void Interact() override;
 
-private:
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Timeline)
+	UTimelineComponent* TimelineComponent;
+
 	FOnTimelineFloat DoorTimelineFloat;
 	bool bIsOpened = false;
 
 	UFUNCTION()
-	void OpenDoor(float Value);
+	virtual void OpenDoor(float Value);
 };

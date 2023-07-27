@@ -13,5 +13,22 @@ UCLASS()
 class UDEMYHORRORGAME_API AInteractionActor_OutwardsDoor : public AInteractionActor_Door
 {
 	GENERATED_BODY()
+
+public:
+	AInteractionActor_OutwardsDoor();
+
+protected:
+	void BeginPlay() override;
+
+	void Tick(float DeltaTime) override;
+
+	void OpenDoor(float Value) override;
+
+public:
+	void Interact() override;
+
+private:
+	float DotProduct;
+
 	
 };
