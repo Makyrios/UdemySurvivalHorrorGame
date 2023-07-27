@@ -20,6 +20,8 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	class USpringArmComponent* SpringArmComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	class UCameraComponent* CameraComponent;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	class USpotLightComponent* SpotlightComponent;
 
 	//* Input 
 
@@ -44,6 +46,10 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* GrabAction;
 
+	/** Grab Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ToggleFlashlightAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
@@ -58,6 +64,7 @@ private:
 	void Interact();
 	void StartGrab();
 	void StopGrab();
+	void ToggleFlashlight();
 
 
 	AActor* LineTrace(float Length);

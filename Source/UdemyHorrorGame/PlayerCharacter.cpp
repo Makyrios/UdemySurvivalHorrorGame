@@ -10,6 +10,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HG_PlayerController.h"
 #include "Grabbable.h"
+#include "Components/SpotLightComponent.h"
 
 
 // Sets default values
@@ -19,10 +20,13 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
-	SpringArmComponent->SetupAttachment(GetCapsuleComponent());
+	SpringArmComponent->SetupAttachment(RootComponent);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
-	CameraComponent->AttachToComponent(SpringArmComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	CameraComponent->SetupAttachment(RootComponent);
+
+	SpotlightComponent = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spotlight Component"));
+	SpotlightComponent->SetupAttachment(SpringArmComponent);
 }
 
 // Called when the game starts or when spawned
@@ -58,8 +62,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::Interact);
 
+		//Grab
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APlayerCharacter::StartGrab);
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopGrab);
+
+		//Toggle Flashlight
+		EnhancedInputComponent->BindAction(ToggleFlashlightAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleFlashlight);
 
 	}
 }
@@ -126,6 +134,18 @@ void APlayerCharacter::StopGrab()
 	{
 		GrabbedActor->Release();
 		GrabbedActor = nullptr;
+	}
+}
+
+void APlayerCharacter::ToggleFlashlight()
+{
+	if (!SpotlightComponent->IsVisible())
+	{
+		SpotlightComponent->SetVisibility(true);
+	}
+	else
+	{
+		SpotlightComponent->SetVisibility(false);
 	}
 }
 

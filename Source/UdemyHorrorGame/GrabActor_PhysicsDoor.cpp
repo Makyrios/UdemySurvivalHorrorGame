@@ -18,6 +18,7 @@ AGrabActor_PhysicsDoor::AGrabActor_PhysicsDoor()
 	DoorStaticMesh->SetSimulatePhysics(true);
 
 	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Physics Constraint"));
+	PhysicsConstraint->SetupAttachment(DoorStaticMesh);
 }
 
 void AGrabActor_PhysicsDoor::BeginPlay()
