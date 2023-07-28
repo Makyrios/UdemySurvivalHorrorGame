@@ -30,5 +30,7 @@ public:
 private:
 	float DotProduct;
 
+	ACharacter* Character;
+
 	
 };

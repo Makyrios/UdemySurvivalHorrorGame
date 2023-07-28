@@ -15,7 +15,7 @@ void AInteractionActor_OutwardsDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	Character = UGameplayStatics::GetPlayerCharacter(this, 0);
 }
 
 void AInteractionActor_OutwardsDoor::Tick(float DeltaTime)
@@ -45,7 +45,7 @@ void AInteractionActor_OutwardsDoor::Interact()
 	else
 	{
 		FVector DoorDirection = GetActorForwardVector();
-		FVector PlayerDirection = UGameplayStatics::GetPlayerCharacter(this, 0)->GetActorForwardVector();
+		FVector PlayerDirection = Character->GetActorForwardVector();
 		DotProduct = FVector::DotProduct(DoorDirection, PlayerDirection);
 
 		TimelineComponent->Play();

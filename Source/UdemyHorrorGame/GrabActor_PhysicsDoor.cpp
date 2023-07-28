@@ -53,7 +53,7 @@ void AGrabActor_PhysicsDoor::Release()
 void AGrabActor_PhysicsDoor::MoveDoor(FVector Force)
 {
 	FVector DoorDirection = GetActorForwardVector();
-	FVector PlayerDirection = UGameplayStatics::GetPlayerCharacter(this, 0)->GetActorForwardVector();
+	FVector PlayerDirection = PlayerCharacter->GetActorForwardVector();
 	float DotProduct = FVector::DotProduct(DoorDirection, PlayerDirection);
 	if (DotProduct < 0)
 	{

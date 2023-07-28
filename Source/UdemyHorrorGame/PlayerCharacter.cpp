@@ -11,6 +11,7 @@
 #include "HG_PlayerController.h"
 #include "Grabbable.h"
 #include "Components/SpotLightComponent.h"
+#include "MoveComponent.h"
 
 
 // Sets default values
@@ -27,6 +28,8 @@ APlayerCharacter::APlayerCharacter()
 
 	SpotlightComponent = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spotlight Component"));
 	SpotlightComponent->SetupAttachment(SpringArmComponent);
+
+	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +38,7 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	Initialize();
+	MoveComponent->Initialize(this);
 	
 }
 
@@ -69,6 +73,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Toggle Flashlight
 		EnhancedInputComponent->BindAction(ToggleFlashlightAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleFlashlight);
 
+		//Sprint
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::StartSprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
 	}
 }
 
@@ -147,6 +154,16 @@ void APlayerCharacter::ToggleFlashlight()
 	{
 		SpotlightComponent->SetVisibility(false);
 	}
+}
+
+void APlayerCharacter::StartSprint()
+{
+	MoveComponent->StartSprint();
+}
+
+void APlayerCharacter::StopSprint()
+{
+	MoveComponent->StopSprint();
 }
 
 AActor* APlayerCharacter::LineTrace(float Length)
