@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
+#include "Components/TimelineComponent.h"
 #include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
 class IGrabbable;
+class UTimelineComponent;
 
 UCLASS()
 class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
@@ -24,6 +26,11 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	class USpotLightComponent* SpotlightComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	class UMoveComponent* MoveComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Crouch")
+	UCurveFloat* CrouchCurveFloat;
+
+	UTimelineComponent* CrouchTimelineComponent;
 
 	//* Input 
 
@@ -56,6 +63,10 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* SprintAction;
 
+	/** Crouch Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* CrouchAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
@@ -63,6 +74,7 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 private:
 	FVector2D LookAxis;
 	IGrabbable* GrabbedActor;
+	FOnTimelineFloat CrouchTimelineFloat;
 
 	//* Input *//
 	void Move(const FInputActionValue& Value);
@@ -73,9 +85,14 @@ private:
 	void ToggleFlashlight();
 	void StartSprint();
 	void StopSprint();
+	void StartCrouch();
+	void StopCrouch();
 
-	AActor* LineTrace(float Length);
 	void Initialize();
+	AActor* LineTrace(float Length);
+
+	UFUNCTION()
+	void SetCapsuleHalfHeight(float Amount);
 
 public:
 	// Sets default values for this character's properties
@@ -94,6 +111,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void ShortenPlayerCapsule();
+	void LengthenPlayerCapsule();
 
 	FORCEINLINE FVector2D GetLookAxis() const { return LookAxis; }
 };

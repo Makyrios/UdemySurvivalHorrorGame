@@ -24,6 +24,7 @@ void UMoveComponent::Initialize(APlayerCharacter* PlayerRef)
 
 void UMoveComponent::StartSprint()
 {
+	if (bIsCrouching) return;
 	if (CurrentStamina > MinStamina)
 	{
 		SetMaxWalkSpeed(SprintSpeed);
@@ -36,6 +37,21 @@ void UMoveComponent::StopSprint()
 	GetWorld()->GetTimerManager().ClearTimer(SprintTimerHandle);
 	SetMaxWalkSpeed(WalkSpeed);
 	GetWorld()->GetTimerManager().SetTimer(RegenerateTimerHandle, this, &UMoveComponent::RegenerateStamina, 0.1, true, StaminaRegenerationDelay);
+}
+
+void UMoveComponent::StartCrouch()
+{
+	GetWorld()->GetTimerManager().ClearTimer(SprintTimerHandle);
+	SetMaxWalkSpeed(CrouchSpeed);
+	PlayerCharacter->ShortenPlayerCapsule();
+	bIsCrouching = true;
+}
+
+void UMoveComponent::StopCrouch()
+{
+	SetMaxWalkSpeed(WalkSpeed);
+	PlayerCharacter->LengthenPlayerCapsule();
+	bIsCrouching = false;
 }
 
 

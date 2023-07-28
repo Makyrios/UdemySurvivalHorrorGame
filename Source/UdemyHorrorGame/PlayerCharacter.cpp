@@ -30,6 +30,8 @@ APlayerCharacter::APlayerCharacter()
 	SpotlightComponent->SetupAttachment(SpringArmComponent);
 
 	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
+
+	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
 }
 
 // Called when the game starts or when spawned
@@ -37,8 +39,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Initialize();
 	MoveComponent->Initialize(this);
+	Initialize();
 	
 }
 
@@ -76,8 +78,23 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Sprint
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::StartSprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
+
+		//Crouch
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &APlayerCharacter::StartCrouch);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopCrouch);
 	}
 }
+
+void APlayerCharacter::ShortenPlayerCapsule()
+{
+	CrouchTimelineComponent->Play();
+}
+
+void APlayerCharacter::LengthenPlayerCapsule()
+{
+	CrouchTimelineComponent->Reverse();
+}
+
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
@@ -166,6 +183,16 @@ void APlayerCharacter::StopSprint()
 	MoveComponent->StopSprint();
 }
 
+void APlayerCharacter::StartCrouch()
+{
+	MoveComponent->StartCrouch();
+}
+
+void APlayerCharacter::StopCrouch()
+{
+	MoveComponent->StopCrouch();
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -177,6 +204,11 @@ AActor* APlayerCharacter::LineTrace(float Length)
 	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
 
 	return HitResult.GetActor();
+}
+
+void APlayerCharacter::SetCapsuleHalfHeight(float Amount)
+{
+	GetCapsuleComponent()->SetCapsuleHalfHeight(Amount);
 }
 
 void APlayerCharacter::Initialize()
@@ -196,4 +228,19 @@ void APlayerCharacter::Initialize()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	//Crouch timeline
+	if (CrouchCurveFloat != nullptr)
+	{
+		CrouchCurveFloat->FloatCurve.Keys[0].Value = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		float TimeToCrouch = (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - MoveComponent->GetCrouchHalfHeight()) / MoveComponent->GetCrouchingSpeed();
+		CrouchCurveFloat->FloatCurve.Keys[1].Time = TimeToCrouch;
+		CrouchCurveFloat->FloatCurve.Keys[1].Value = MoveComponent->GetCrouchHalfHeight();
+
+		UE_LOG(LogTemp, Warning, TEXT("%f"), CrouchCurveFloat->FloatCurve.Keys[1].Value);
+
+		CrouchTimelineFloat.BindDynamic(this, &APlayerCharacter::SetCapsuleHalfHeight);
+		CrouchTimelineComponent->AddInterpFloat(CrouchCurveFloat, CrouchTimelineFloat);
+	}
+
 }
