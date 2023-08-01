@@ -12,7 +12,9 @@
 #include "Grabbable.h"
 #include "Components/SpotLightComponent.h"
 #include "MoveComponent.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
+#include <Kismet/GameplayStatics.h>
+#include "InventoryComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -32,6 +34,8 @@ APlayerCharacter::APlayerCharacter()
 	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 
 	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +86,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Crouch
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &APlayerCharacter::StartCrouch);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopCrouch);
+
+		//Toggle Inventory
+		EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Completed, this, &APlayerCharacter::ToggleInventory);
 	}
 }
 
@@ -117,6 +124,7 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
+	HeadBob();
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
@@ -193,6 +201,33 @@ void APlayerCharacter::StopCrouch()
 	MoveComponent->StopCrouch();
 }
 
+void APlayerCharacter::ToggleInventory()
+{
+	if (!bIsPaused)
+	{
+		bIsPaused = true;
+		GetCharacterMovement()->DisableMovement();
+		PlayerController->SetIgnoreLookInput(true);
+		PlayerController->bShowMouseCursor = true;
+		InventoryMenuWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(InventoryMenuWidget->GetCachedWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(true);
+		PlayerController->SetInputMode(InputMode);
+	}
+	else
+	{
+		bIsPaused = false;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->bShowMouseCursor = false;
+		InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		PlayerController->SetInputMode(FInputModeGameOnly());
+	}
+	
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -211,6 +246,32 @@ void APlayerCharacter::SetCapsuleHalfHeight(float Amount)
 	GetCapsuleComponent()->SetCapsuleHalfHeight(Amount);
 }
 
+void APlayerCharacter::HeadBob()
+{
+	if (!WalkHeadBob || !RunHeadBob)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Head bobs are null"));
+		return;
+	}
+	if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetWalkSpeed() && !GetCharacterMovement()->IsFalling())
+	{
+		if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetSprintSpeed() && !GetCharacterMovement()->IsFalling())
+		{
+			TRange<float> Range1 { 0.f, MoveComponent->GetSprintSpeed() };
+			TRange<float> Range2 {0, 1};
+			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
+			PlayerController->ClientStartCameraShake(RunHeadBob, BobScale);
+		}
+		else
+		{
+			TRange<float> Range1 { 0.f, MoveComponent->GetWalkSpeed() };
+			TRange<float> Range2 {0, 1};
+			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
+			PlayerController->ClientStartCameraShake(WalkHeadBob);
+		}
+	}
+}
+
 void APlayerCharacter::Initialize()
 {
 	//HUD
@@ -219,15 +280,23 @@ void APlayerCharacter::Initialize()
 		UUserWidget* MainHUDWidget = CreateWidget<UUserWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
 		MainHUDWidget->AddToViewport();
 	}
-
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (InventoryMenuClass)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		UInventoryMenuWidget* MenuWidget = CreateWidget<UInventoryMenuWidget>(Cast<AHG_PlayerController>(GetController()), InventoryMenuClass);
+		MenuWidget->AddToViewport();
+		MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		InventoryMenuWidget = MenuWidget;
+	}
+
+	if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+	{
+		//Add Input Mapping Context
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
 
 	//Crouch timeline
 	if (CrouchCurveFloat != nullptr)
@@ -237,10 +306,11 @@ void APlayerCharacter::Initialize()
 		CrouchCurveFloat->FloatCurve.Keys[1].Time = TimeToCrouch;
 		CrouchCurveFloat->FloatCurve.Keys[1].Value = MoveComponent->GetCrouchHalfHeight();
 
-		UE_LOG(LogTemp, Warning, TEXT("%f"), CrouchCurveFloat->FloatCurve.Keys[1].Value);
-
 		CrouchTimelineFloat.BindDynamic(this, &APlayerCharacter::SetCapsuleHalfHeight);
 		CrouchTimelineComponent->AddInterpFloat(CrouchCurveFloat, CrouchTimelineFloat);
 	}
+
+	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
 
 }

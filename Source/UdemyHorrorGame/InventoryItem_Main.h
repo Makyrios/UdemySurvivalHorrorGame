@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ItemData.h"
 #include "InventoryItem_Main.generated.h"
 
 UCLASS()
@@ -15,7 +16,12 @@ public:
 	// Sets default values for this actor's properties
 	AInventoryItem_Main();
 
+	inline const FItemData GetItemData() const { return ItemData; }
+
 protected:
+	UPROPERTY(EditAnywhere, Category = Item)
+	FItemData ItemData;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

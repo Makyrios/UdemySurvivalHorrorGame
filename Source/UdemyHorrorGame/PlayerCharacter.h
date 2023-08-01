@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
 #include "Components/TimelineComponent.h"
+#include "InventoryMenuWidget.h"
 #include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
@@ -25,7 +26,15 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	class USpotLightComponent* SpotlightComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> WalkHeadBob;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> RunHeadBob;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
 	class UMoveComponent* MoveComponent;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	class UInventoryComponent* InventoryComponent;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crouch")
 	UCurveFloat* CrouchCurveFloat;
@@ -67,14 +76,26 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* CrouchAction;
 
+	/** Crouch Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ToggleInventoryAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<UInventoryMenuWidget> InventoryMenuClass;
 
 private:
 	FVector2D LookAxis;
 	IGrabbable* GrabbedActor;
 	FOnTimelineFloat CrouchTimelineFloat;
+	APlayerController* PlayerController;
+	bool bIsPaused = false;
+
+	UInventoryMenuWidget* InventoryMenuWidget;
+
+	void Initialize();
 
 	//* Input *//
 	void Move(const FInputActionValue& Value);
@@ -87,16 +108,22 @@ private:
 	void StopSprint();
 	void StartCrouch();
 	void StopCrouch();
+	void ToggleInventory();
 
-	void Initialize();
 	AActor* LineTrace(float Length);
 
 	UFUNCTION()
 	void SetCapsuleHalfHeight(float Amount);
 
+	void HeadBob();
+
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
+
+	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
+	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	inline UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
 	float TraceLength = 400;
@@ -115,5 +142,5 @@ public:
 	void ShortenPlayerCapsule();
 	void LengthenPlayerCapsule();
 
-	FORCEINLINE FVector2D GetLookAxis() const { return LookAxis; }
+	inline FVector2D GetLookAxis() const { return LookAxis; }
 };

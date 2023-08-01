@@ -2,14 +2,19 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CoreMinimal.h"  
+#include "ItemData.generated.h"
 
-/**
- * 
- */
-class UDEMYHORRORGAME_API ItemData
+USTRUCT(BlueprintType)
+struct FItemData
 {
-public:
-	ItemData();
-	~ItemData();
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+	FName ItemName;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	UTexture2D* Icon;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	int MaxStackAmount;
+
 };

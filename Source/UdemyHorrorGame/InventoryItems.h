@@ -3,13 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InventoryItem_Main.h"
+#include "InventoryItems.generated.h"
 
-/**
- * 
- */
-class UDEMYHORRORGAME_API InventoryItems
+USTRUCT(BlueprintType)
+struct FInventoryItems
 {
-public:
-	InventoryItems();
-	~InventoryItems();
+	GENERATED_BODY()
+	
+	FInventoryItems()
+	{
+		Item = nullptr;
+		Amount = 0;
+	}
+
+	FInventoryItems(TSubclassOf<AInventoryItem_Main> Item_, int Amount_)
+	{
+		Item = Item_;
+		Amount = Amount_;
+	}
+
+	UPROPERTY(EditAnywhere, Category = Items)
+	TSubclassOf<AInventoryItem_Main> Item;
+
+	UPROPERTY(EditAnywhere, Category = Items)
+	int Amount;
 };

@@ -35,9 +35,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	FORCEINLINE float GetCrouchingSpeed() const { return CrouchingSpeed; }
-	FORCEINLINE float GetCrouchHalfHeight() const { return CrouchHalfHeight; }
-
+	inline float GetCrouchingSpeed() const { return CrouchingSpeed; }
+	inline float GetCrouchHalfHeight() const { return CrouchHalfHeight; }
+	inline float GetWalkSpeed() const { return WalkSpeed; }
+	inline float GetSprintSpeed() const { return SprintSpeed; }
 
 private:
 	void SetMaxWalkSpeed(float Speed);

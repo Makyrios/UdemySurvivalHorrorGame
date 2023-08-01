@@ -13,5 +13,9 @@ UCLASS()
 class UDEMYHORRORGAME_API AHG_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+	int InventorySlots = 8;
 	
 };
