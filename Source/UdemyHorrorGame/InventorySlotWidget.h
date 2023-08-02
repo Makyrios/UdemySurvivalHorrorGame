@@ -46,11 +46,22 @@ public:
 
 	void UpdateSlot();
 
+
+	inline int GetIndex() const { return Index; }
+
 private:
 	int Index;
 	class APlayerCharacter* PlayerCharacter;
+	class UInventoryMenuWidget* InventoryMenu;
+	FKey LastPressedButton;
+
+protected:
+	void NativeConstruct() override;
+
+	FReply NativeOnMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& MouseEvent) override;
+	FReply NativeOnMouseButtonUp(const FGeometry& Geometry, const FPointerEvent& MouseEvent) override;
 
 public:
-	void InitializeWidget(int ind);
+	void InitializeWidget(int ind, UInventoryMenuWidget* InventoryMenuRef);
 
 };

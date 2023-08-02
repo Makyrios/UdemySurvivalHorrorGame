@@ -37,9 +37,48 @@ void UInventorySlotWidget::UpdateSlot()
 	}
 }
 
-void UInventorySlotWidget::InitializeWidget(int ind)
+void UInventorySlotWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+}
+
+FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& MouseEvent)
+{
+	Super::NativeOnMouseButtonDown(Geometry, MouseEvent);
+
+	if (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		LastPressedButton = EKeys::LeftMouseButton;
+	}
+	else if (MouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		LastPressedButton = EKeys::RightMouseButton;
+	}
+	return FReply::Handled();
+}
+
+FReply UInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& Geometry, const FPointerEvent& MouseEvent)
+{
+	Super::NativeOnMouseButtonUp(Geometry, MouseEvent);
+
+	if (LastPressedButton == EKeys::LeftMouseButton)
+	{
+		// Item info
+	}
+	else if (LastPressedButton == EKeys::RightMouseButton)
+	{
+		InventoryMenu->OpenDropdownMenu(this);
+	}
+
+
+	return FReply::Handled();
+}
+
+void UInventorySlotWidget::InitializeWidget(int ind, UInventoryMenuWidget* InventoryMenuRef)
 {
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	InventoryMenu = InventoryMenuRef;
 	Index = ind;
 	UpdateSlot();
 }

@@ -4,49 +4,42 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "InventoryMenuWidget.generated.h"
+#include "InventoryDropdownWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UDEMYHORRORGAME_API UInventoryMenuWidget : public UUserWidget
+class UDEMYHORRORGAME_API UInventoryDropdownWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UCanvasPanel* Canvas;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UInventoryGridWidget* InventoryGrid;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UImage* Background;
+	class USizeBox* DropdownSizeBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UVerticalBox* VerticalBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class USizeBox* SizeBox;
+	class USizeBox* UseSizeBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class USizeBox* ExamineSizeBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class USizeBox* DropSizeBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* InventoryText;
+	class UButton* UseButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UButton* ExamineButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UButton* DropButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UInventoryDropdownWidget* DropdownWidget;
-
+	class UTextBlock* UseText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* CloseDropdownMenuButton;
+	class UTextBlock* ExamineText;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* DropText;
 
-
-	void OpenDropdownMenu(class UInventorySlotWidget* SlotWidget);
-	UFUNCTION()
-	void CloseDropdownMenu();
-
-protected:
-	void NativeConstruct() override;
-
-private:
-	
 };

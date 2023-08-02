@@ -21,7 +21,6 @@ void UInventoryGridWidget::NativeConstruct()
 	{
 		UInventorySlotWidget* SlotWidget = CreateWidget<UInventorySlotWidget>(PlayerContr, SlotWidgetClass);
 		SlotsArray.Add(SlotWidget);
-		SlotWidget->InitializeWidget(i);
 
 		int Row = i / SlotsPerRow;
 		int Col = i % SlotsPerRow;
