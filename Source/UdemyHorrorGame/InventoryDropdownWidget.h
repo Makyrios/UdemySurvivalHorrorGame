@@ -42,4 +42,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* DropText;
 
+protected:
+	void NativeConstruct() override;
+	
+public:
+	void UpdateMenu(class UInventorySlotWidget* SlotWidget);
+
+	UFUNCTION()
+	void UseItem();
+
+private:
+	class APlayerCharacter* PlayerCharacter;
+	int SlotIndex;
+
 };

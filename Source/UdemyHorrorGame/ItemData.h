@@ -16,5 +16,7 @@ struct FItemData
 	UTexture2D* Icon;
 	UPROPERTY(EditAnywhere, Category = "Item")
 	int MaxStackAmount;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	bool bCanBeUsed = true;
 
 };

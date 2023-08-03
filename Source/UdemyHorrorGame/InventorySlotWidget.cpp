@@ -13,26 +13,22 @@
 void UInventorySlotWidget::UpdateSlot()
 {
 	int Amount = 0;
-	FItemData Data = PlayerCharacter->GetInventoryComponent()->GetItemDataAtIndex(Index, &Amount);
-	if (Data.ItemName.IsNone())
+	AInventoryItem_Main* Item = PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(Index, &Amount).GetDefaultObject();
+	if (Item == nullptr)
 	{
-		UE_LOG(LogTemp, Display, TEXT("None name %s"), *Data.ItemName.ToString());
 		SlotButton->SetIsEnabled(false);
 		SlotImage->SetBrushFromTexture(EmptyIcon, true);
+		AmountText->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Is name %s"), *Data.ItemName.ToString());
+		FItemData Data = Item->GetItemData();
 		SlotButton->SetIsEnabled(true);
 		SlotImage->SetBrushFromTexture(Data.Icon, true);
 		if (Amount > 0)
 		{
 			AmountText->SetText(FText::AsNumber(Amount));
 			AmountText->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			AmountText->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

@@ -48,5 +48,5 @@ protected:
 	void NativeConstruct() override;
 
 private:
-	
+	class APlayerCharacter* PlayerCharacter;
 };

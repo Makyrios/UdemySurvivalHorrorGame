@@ -6,6 +6,9 @@
 #include "PlayerCharacter.h"
 #include "InventoryGridWidget.h"
 #include "InventorySlotWidget.h"
+#include <Kismet/GameplayStatics.h>
+#include "Usable.h"
+#include "InventoryItem_Usable.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -68,16 +71,34 @@ bool UInventoryComponent::AddItem(TSubclassOf<AInventoryItem_Main> Item, int Amo
 	return false;
 }
 
-FItemData UInventoryComponent::GetItemDataAtIndex(int Index, int* Amount) const
+bool UInventoryComponent::RemoveItem(int Index)
+{
+	FInventoryItems Item = InventorySlots[Index];
+	if (!Item.Item) return false;
+
+	if (Item.Amount > 1)
+	{
+		InventorySlots[Index].Amount -= 1;
+	}
+	else
+	{
+		InventorySlots[Index] = FInventoryItems();
+	}
+	UpdateInventorySlot(Index);
+	return true;
+}
+
+TSubclassOf<AInventoryItem_Main> UInventoryComponent::GetItemClassAtIndex(int Index, int* outAmount) const
 {
 	if (InventorySlots.IsValidIndex(Index) && InventorySlots[Index].Item)
 	{
 		FInventoryItems item = InventorySlots[Index];
-		if (Amount != nullptr) *Amount = item.Amount;
-		return item.Item.GetDefaultObject()->GetItemData();
+		if (outAmount != nullptr) *outAmount = item.Amount;
+		return item.Item;
 	}
-	return FItemData();
+	return nullptr;
 }
+
 
 void UInventoryComponent::UpdateInventorySlot(int Index)
 {
@@ -86,6 +107,33 @@ void UInventoryComponent::UpdateInventorySlot(int Index)
 	{
 		Slot->UpdateSlot();
 	}
+}
+
+void UInventoryComponent::UseItem(int Index)
+{
+	TSubclassOf<AInventoryItem_Main> UsableItemClass = GetItemClassAtIndex(Index);
+	if (!UsableItemClass)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Could not find item at index %d"), Index);
+		return;
+	}
+
+	AActor* ItemActor = UGameplayStatics::GetActorOfClass(this, UsableItemClass);
+	if (ItemActor == nullptr)
+	{
+		ItemActor = GetWorld()->SpawnActor(UsableItemClass);
+	}
+
+	if (IUsable* UsableItem = Cast<IUsable>(ItemActor))
+	{
+		UsableItem->UseItem();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("Could not cast to usable"));
+	}
+	RemoveItem(Index);
+	PlayerCharacter->GetInventoryMenuWidget()->CloseDropdownMenu();
 }
 
 
