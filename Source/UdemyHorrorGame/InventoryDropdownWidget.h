@@ -51,6 +51,9 @@ public:
 	UFUNCTION()
 	void UseItem();
 
+	UFUNCTION()
+	void DropItem();
+
 private:
 	class APlayerCharacter* PlayerCharacter;
 	int SlotIndex;

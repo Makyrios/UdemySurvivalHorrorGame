@@ -124,6 +124,7 @@ public:
 	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
 	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	inline UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
+	inline UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
 	float TraceLength = 400;

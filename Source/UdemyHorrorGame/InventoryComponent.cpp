@@ -9,6 +9,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "Usable.h"
 #include "InventoryItem_Usable.h"
+#include "Camera/CameraComponent.h"
+#include "PickupActor_Main.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -114,7 +116,7 @@ void UInventoryComponent::UseItem(int Index)
 	TSubclassOf<AInventoryItem_Main> UsableItemClass = GetItemClassAtIndex(Index);
 	if (!UsableItemClass)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Could not find item at index %d"), Index);
+		UE_LOG(LogTemp, Warning, TEXT("Could not find item at index %d"), Index);
 		return;
 	}
 
@@ -132,6 +134,35 @@ void UInventoryComponent::UseItem(int Index)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Could not cast to usable"));
 	}
+	RemoveItem(Index);
+	// Close menu after removing the item
+	PlayerCharacter->GetInventoryMenuWidget()->CloseDropdownMenu();
+}
+
+void UInventoryComponent::DropItem(int Index)
+{
+	TSubclassOf<AInventoryItem_Main> ItemClass = GetItemClassAtIndex(Index);
+	if (!ItemClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not find item at index %d"), Index);
+		return;
+	}
+	
+	UCameraComponent* CameraComponent = PlayerCharacter->GetCameraComponent();
+	FHitResult HitResult;
+	FVector Start = CameraComponent->GetComponentLocation();
+	FVector End = Start + CameraComponent->GetForwardVector() * DropLength;
+	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+	APickupActor_Main* SpawnedActor = nullptr;
+	if (bWasHit)
+	{
+		SpawnedActor = Cast<APickupActor_Main>(GetWorld()->SpawnActor(ItemClass.GetDefaultObject()->GetItemData().PickupActor, &HitResult.Location));
+	}
+	else
+	{
+		SpawnedActor = Cast<APickupActor_Main>(GetWorld()->SpawnActor(ItemClass.GetDefaultObject()->GetItemData().PickupActor, &End));
+	}
+	SpawnedActor->StaticMesh->SetSimulatePhysics(true);
 	RemoveItem(Index);
 	PlayerCharacter->GetInventoryMenuWidget()->CloseDropdownMenu();
 }

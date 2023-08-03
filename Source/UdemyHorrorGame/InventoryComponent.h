@@ -26,6 +26,11 @@ public:
 	/// <returns>Success of adding item</returns>
 	bool AddItem(TSubclassOf<AInventoryItem_Main> Item, int Amount, int* outRemainder = nullptr);
 
+	/// <summary>
+	/// Remove item at index and update widget
+	/// </summary>
+	/// <param name="Index">Index of the slot</param>
+	/// <returns>Success</returns>
 	bool RemoveItem(int Index);
 
 	/// <summary>
@@ -42,7 +47,13 @@ public:
 	/// <param name="Index">Index of the slot</param>
 	void UpdateInventorySlot(int Index);
 
+	/// <summary>
+	/// Use item at index and remove it
+	/// </summary>
+	/// <param name="Index">Index of the item</param>
 	void UseItem(int Index);
+
+	void DropItem(int Index);
 
 protected:
 	// Called when the game starts
@@ -52,6 +63,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	float DropLength = 300;
 
 private:
 	TArray<FInventoryItems> InventorySlots;

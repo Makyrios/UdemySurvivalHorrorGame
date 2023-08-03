@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"  
+#include "CoreMinimal.h"
 #include "ItemData.generated.h"
+
+class APickupActor_Main;
 
 USTRUCT(BlueprintType)
 struct FItemData
@@ -18,5 +20,8 @@ struct FItemData
 	int MaxStackAmount;
 	UPROPERTY(EditAnywhere, Category = "Item")
 	bool bCanBeUsed = true;
-
+	UPROPERTY(EditAnywhere, Category = "Item")
+	bool bCanBeDropped = true;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	TSubclassOf<APickupActor_Main> PickupActor;
 };
