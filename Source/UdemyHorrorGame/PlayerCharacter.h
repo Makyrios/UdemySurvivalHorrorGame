@@ -47,6 +47,8 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* PickupItemMappingContext;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -80,6 +82,10 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* ToggleInventoryAction;
 
+	/** Pickup Item Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* PickupItemAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
@@ -92,6 +98,7 @@ private:
 	FOnTimelineFloat CrouchTimelineFloat;
 	APlayerController* PlayerController;
 	bool bIsPaused = false;
+	int CurrentPickupActorsNum = 0;
 
 	UInventoryMenuWidget* InventoryMenuWidget;
 
@@ -109,6 +116,7 @@ private:
 	void StartCrouch();
 	void StopCrouch();
 	void ToggleInventory();
+	void PickupItem();
 
 	AActor* LineTrace(float Length);
 
@@ -117,17 +125,23 @@ private:
 
 	void HeadBob();
 
+	void CheckPickupContext();
+
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interact")
+	float TraceLength = 400;
+
+	class APickupActor_Main* CurrentPickupItem;
 
 	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
 	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	inline UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
 	inline UCameraComponent* GetCameraComponent() const { return CameraComponent; }
-
-	UPROPERTY(EditDefaultsOnly, Category = "Interact")
-	float TraceLength = 400;
+	inline UInputMappingContext* GetInputMappingContext() const { return DefaultMappingContext; }
+	inline UInputMappingContext* GetPickupItemMappingContext() const { return PickupItemMappingContext; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -144,4 +158,9 @@ public:
 	void LengthenPlayerCapsule();
 
 	inline FVector2D GetLookAxis() const { return LookAxis; }
+
+	UFUNCTION()
+	void EnterPickup();
+	UFUNCTION()
+	void LeavePickup();
 };

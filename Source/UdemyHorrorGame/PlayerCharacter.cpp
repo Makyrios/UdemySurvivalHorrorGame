@@ -15,6 +15,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "InventoryComponent.h"
+#include "PickupActor_Main.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -89,6 +90,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		//Toggle Inventory
 		EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Completed, this, &APlayerCharacter::ToggleInventory);
+
+		//Pickup Item
+		EnhancedInputComponent->BindAction(PickupItemAction, ETriggerEvent::Completed, this, &APlayerCharacter::PickupItem);
 	}
 }
 
@@ -147,6 +151,11 @@ void APlayerCharacter::Interact()
 	if (IInteractable* InteractActor = Cast<IInteractable>(HitActor))
 	{
 		InteractActor->Interact();
+	}
+	// After interact update pickup context
+	if (CurrentPickupActorsNum > 0)
+	{
+		CheckPickupContext();
 	}
 }
 
@@ -228,6 +237,29 @@ void APlayerCharacter::ToggleInventory()
 	
 }
 
+void APlayerCharacter::PickupItem()
+{
+	if (CurrentPickupItem != nullptr)
+	{
+		// If player looking at an interactable actor, then interacting with it will be prioritized
+		// Otherwise pickup actor
+		if (Cast<IInteractable>(LineTrace(TraceLength)))
+		{
+			if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+			{
+				if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+				{
+					Subsystem->RemoveMappingContext(PickupItemMappingContext);
+					Subsystem->AddMappingContext(DefaultMappingContext, 0);
+				}
+			}
+			Interact();
+			return;
+		}
+		CurrentPickupItem->Pickup();
+	}
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -272,6 +304,46 @@ void APlayerCharacter::HeadBob()
 	}
 }
 
+void APlayerCharacter::CheckPickupContext()
+{
+	if (CurrentPickupActorsNum >= 1)
+	{
+		if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+			{
+				Subsystem->RemoveMappingContext(DefaultMappingContext);
+				Subsystem->AddMappingContext(PickupItemMappingContext, 1);
+			}
+		}
+	}
+	else if (CurrentPickupActorsNum <= 0)
+	{
+		if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+			{
+				Subsystem->RemoveMappingContext(PickupItemMappingContext);
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+		}
+		CurrentPickupActorsNum = 0;
+	}
+}
+
+void APlayerCharacter::EnterPickup()
+{
+	UE_LOG(LogTemp, Display, TEXT("Enter pickup"));
+	CurrentPickupActorsNum++;
+	CheckPickupContext();
+}
+
+void APlayerCharacter::LeavePickup()
+{
+	CurrentPickupActorsNum--;
+	CheckPickupContext();
+}
+
 void APlayerCharacter::Initialize()
 {
 	//HUD
@@ -311,6 +383,5 @@ void APlayerCharacter::Initialize()
 	}
 
 	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
 
 }
