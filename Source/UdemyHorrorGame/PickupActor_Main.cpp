@@ -70,7 +70,6 @@ void APickupActor_Main::Tick(float DeltaTime)
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(PlayerCharacter);
 		Params.AddIgnoredActor(this);
-		Params.TraceTag = "Trace";
 		bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, Params);
 		if (!bWasHit)
 		{
