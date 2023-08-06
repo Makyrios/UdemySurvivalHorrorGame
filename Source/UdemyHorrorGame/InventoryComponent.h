@@ -37,7 +37,7 @@ public:
 	/// Get class of item in the array by index
 	/// </summary>
 	/// <param name="Index">Index of the item in the array</param>
-	/// <param name="Amount">Amount of item</param>
+	/// <param name="outAmount">Out amount of item</param>
 	/// <returns>If index is valid return FItemData of the item, otherwise FItemData()</returns>
 	TSubclassOf<AInventoryItem_Main> GetItemClassAtIndex(int Index, int* outAmount = nullptr) const;
 

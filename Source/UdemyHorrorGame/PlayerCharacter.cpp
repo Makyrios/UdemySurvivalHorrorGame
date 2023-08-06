@@ -232,6 +232,8 @@ void APlayerCharacter::ToggleInventory()
 		PlayerController->SetIgnoreLookInput(false);
 		PlayerController->bShowMouseCursor = false;
 		InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		InventoryMenuWidget->HideItemDetails();
+		InventoryMenuWidget->CloseDropdownMenu();
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
 	

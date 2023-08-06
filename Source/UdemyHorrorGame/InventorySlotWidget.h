@@ -40,9 +40,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Icon)
 	class UTexture2D* EmptyIcon;
-	
-	/*FItemData ItemData;
-	int Amount;*/
 
 	void UpdateSlot();
 
@@ -54,6 +51,9 @@ private:
 	class APlayerCharacter* PlayerCharacter;
 	class UInventoryMenuWidget* InventoryMenu;
 	FKey LastPressedButton;
+
+	UFUNCTION()
+	void ShowItemDetails();
 
 protected:
 	void NativeConstruct() override;

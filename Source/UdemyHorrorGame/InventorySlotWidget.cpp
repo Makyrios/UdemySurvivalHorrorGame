@@ -37,6 +37,12 @@ void UInventorySlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
+	SlotButton->OnClicked.AddDynamic(this, &UInventorySlotWidget::ShowItemDetails);
+}
+
+void UInventorySlotWidget::ShowItemDetails()
+{
+	InventoryMenu->ShowItemDetails(this);
 }
 
 FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& MouseEvent)
@@ -58,11 +64,9 @@ FReply UInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& Geometry, co
 {
 	Super::NativeOnMouseButtonUp(Geometry, MouseEvent);
 
-	if (LastPressedButton == EKeys::LeftMouseButton)
-	{
-		// Item info
-	}
-	else if (LastPressedButton == EKeys::RightMouseButton)
+	UE_LOG(LogTemp, Display, TEXT("%s"), *MouseEvent.GetEffectingButton().GetFName().ToString());
+
+	if (LastPressedButton == EKeys::RightMouseButton)
 	{
 		InventoryMenu->OpenDropdownMenu(this);
 	}

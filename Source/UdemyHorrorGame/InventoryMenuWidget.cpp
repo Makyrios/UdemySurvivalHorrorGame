@@ -11,6 +11,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "PlayerCharacter.h"
 #include "InventoryComponent.h"
+#include "Components/VerticalBox.h"
+#include "Components/TextBlock.h"
 
 void UInventoryMenuWidget::OpenDropdownMenu(UInventorySlotWidget* SlotWidget)
 {
@@ -44,6 +46,27 @@ void UInventoryMenuWidget::CloseDropdownMenu()
 {
 	DropdownWidget->SetVisibility(ESlateVisibility::Collapsed);
 	CloseDropdownMenuButton->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UInventoryMenuWidget::ShowItemDetails(UInventorySlotWidget* SlotWidget)
+{
+	if (SlotWidget == nullptr) return;
+
+	FItemData ItemData;
+	UE_LOG(LogTemp, Display, TEXT("Index: %d"), SlotWidget->GetIndex());
+	AInventoryItem_Main* ItemObject = PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(SlotWidget->GetIndex()).GetDefaultObject();
+	if (ItemObject)
+	{
+		ItemData = ItemObject->GetItemData();
+		NameText->SetText(FText::FromName(ItemData.ItemName));
+		DescriptionText->SetText(FText::FromName(ItemData.Description));
+	}
+	DetailsVerticalBox->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UInventoryMenuWidget::HideItemDetails()
+{
+	DetailsVerticalBox->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UInventoryMenuWidget::NativeConstruct()
