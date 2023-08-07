@@ -146,6 +146,7 @@ void UInventoryComponent::ExamineItem(int Index)
 	ExaminationWidget->UpdateWidget(Index);
 	InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
 	ExaminationWidget->AddToViewport(2);
+	PlayerCharacter->GetInventoryComponent()->GetInventoryMenuWidget()->CloseDropdownMenu();
 	PlayerCharacter->bIsInventoryOpen = false;
 }
 

@@ -45,10 +45,17 @@ public:
 protected:
 	void NativeConstruct() override;
 
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+
 private:
 	class UInventoryComponent* InventoryComponent;
 	class APlayerCharacter* PlayerCharacter;
 
+	bool bRotateMesh = false;
+	FVector2D StartMouseLocation;
 
 	void CloseExaminationWidget();
 };

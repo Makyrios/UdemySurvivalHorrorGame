@@ -25,7 +25,7 @@ void UInventorySlotWidget::UpdateSlot()
 		FItemData Data = Item->GetItemData();
 		SlotButton->SetIsEnabled(true);
 		SlotImage->SetBrushFromTexture(Data.Icon, true);
-		if (Amount > 0)
+		if (Amount > 1)
 		{
 			AmountText->SetText(FText::AsNumber(Amount));
 			AmountText->SetVisibility(ESlateVisibility::Visible);

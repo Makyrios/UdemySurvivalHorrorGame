@@ -31,5 +31,7 @@ struct FItemData
 	UPROPERTY(EditAnywhere, Category = "Item")
 	class UStaticMesh* ExaminationMesh;
 	UPROPERTY(EditAnywhere, Category = "Item")
-	float ExaminationMeshOffset;
+	float ExaminationMeshOffset = 20;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	FRotator ExaminationMeshRotation;
 };

@@ -31,6 +31,22 @@ void UInventoryDropdownWidget::UpdateMenu(UInventorySlotWidget* SlotWidget)
 	{
 		UseButton->SetVisibility(ESlateVisibility::Collapsed);
 	}
+	if (PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(SlotWidget->GetIndex()).GetDefaultObject()->GetItemData().bCanBeExamined)
+	{
+		ExamineButton->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		ExamineButton->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	if (PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(SlotWidget->GetIndex()).GetDefaultObject()->GetItemData().bCanBeDropped)
+	{
+		DropButton->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		DropButton->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UInventoryDropdownWidget::UseItem()
