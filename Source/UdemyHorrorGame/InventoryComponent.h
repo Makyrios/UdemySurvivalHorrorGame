@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InventoryItems.h"
+#include "ExaminationWidget.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -50,30 +51,59 @@ public:
 	/// <summary>
 	/// Use item at index and remove it
 	/// </summary>
-	/// <param name="Index">Index of the item</param>
+	/// <param name="Index">Index of the slot</param>
 	void UseItem(int Index);
 
+	/// <summary>
+	/// Open examining widget
+	/// </summary>
+	/// <param name="Index">Index of the slot</param>
+	void ExamineItem(int Index);
+
+	/// <summary>
+	/// Drop item from inventory
+	/// </summary>
+	/// <param name="Index">Index of the slot</param>
 	void DropItem(int Index);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	void Initialize();
+
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+
 	UPROPERTY(EditAnywhere, Category = Item)
 	float DropLength = 300;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<class UInventoryMenuWidget> InventoryMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<UExaminationWidget> ExaminationWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<AActor> ExaminationActorClass;
+
+public:
+	inline class AExamination* GetExaminationActor() const { return ExaminationActor; }
+	inline class UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
+
 private:
 	TArray<FInventoryItems> InventorySlots;
-
 	
 	class AHG_PlayerController* PlayerContr;
 	class APlayerCharacter* PlayerCharacter;
+	class UInventoryMenuWidget* InventoryMenuWidget;
+	class UExaminationWidget* ExaminationWidget;
+	class AExamination* ExaminationActor;
 
 	int CheckForEmptySlot() const;
 	int CheckForFreeSlot(TSubclassOf<AInventoryItem_Main> ItemClass) const;
+
+	//void CreateExaminationWidget(int Index);
 };

@@ -93,6 +93,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		//Pickup Item
 		EnhancedInputComponent->BindAction(PickupItemAction, ETriggerEvent::Completed, this, &APlayerCharacter::PickupItem);
+
+		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &APlayerCharacter::Return);
 	}
 }
 
@@ -212,28 +214,33 @@ void APlayerCharacter::StopCrouch()
 
 void APlayerCharacter::ToggleInventory()
 {
-	if (!bIsPaused)
+	UInventoryMenuWidget* InventoryMenu = InventoryComponent->GetInventoryMenuWidget();
+	if (!bIsInventoryOpen)
 	{
-		bIsPaused = true;
+		bIsInventoryOpen = true;
 		GetCharacterMovement()->DisableMovement();
 		PlayerController->SetIgnoreLookInput(true);
 		PlayerController->bShowMouseCursor = true;
-		InventoryMenuWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		InventoryMenu->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		FInputModeGameAndUI InputMode;
-		InputMode.SetWidgetToFocus(InventoryMenuWidget->GetCachedWidget());
+		InputMode.SetWidgetToFocus(InventoryMenu->GetCachedWidget());
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 		InputMode.SetHideCursorDuringCapture(true);
+		if (ExaminationWidget->IsVisible())
+		{
+			ExaminationWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		PlayerController->SetInputMode(InputMode);
 	}
 	else
 	{
-		bIsPaused = false;
+		bIsInventoryOpen = false;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->ResetIgnoreLookInput();
 		PlayerController->bShowMouseCursor = false;
-		InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
-		InventoryMenuWidget->HideItemDetails();
-		InventoryMenuWidget->CloseDropdownMenu();
+		InventoryMenu->SetVisibility(ESlateVisibility::Collapsed);
+		InventoryMenu->HideItemDetails();
+		InventoryMenu->CloseDropdownMenu();
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
 	
@@ -260,6 +267,11 @@ void APlayerCharacter::PickupItem()
 		}
 		CurrentPickupItem->Pickup();
 	}
+}
+
+void APlayerCharacter::Return()
+{
+	PressedReturnEvent.Broadcast();
 }
 
 AActor* APlayerCharacter::LineTrace(float Length)
@@ -353,13 +365,6 @@ void APlayerCharacter::Initialize()
 	{
 		UUserWidget* MainHUDWidget = CreateWidget<UUserWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
 		MainHUDWidget->AddToViewport();
-	}
-	if (InventoryMenuClass)
-	{
-		UInventoryMenuWidget* MenuWidget = CreateWidget<UInventoryMenuWidget>(Cast<AHG_PlayerController>(GetController()), InventoryMenuClass);
-		MenuWidget->AddToViewport();
-		MenuWidget->SetVisibility(ESlateVisibility::Collapsed);
-		InventoryMenuWidget = MenuWidget;
 	}
 
 	if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))

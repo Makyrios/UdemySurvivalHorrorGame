@@ -25,5 +25,11 @@ struct FItemData
 	UPROPERTY(EditAnywhere, Category = "Item")
 	bool bCanBeDropped = true;
 	UPROPERTY(EditAnywhere, Category = "Item")
+	bool bCanBeExamined = true;
+	UPROPERTY(EditAnywhere, Category = "Item")
 	TSubclassOf<APickupActor_Main> PickupActor;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	class UStaticMesh* ExaminationMesh;
+	UPROPERTY(EditAnywhere, Category = "Item")
+	float ExaminationMeshOffset;
 };

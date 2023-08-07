@@ -9,6 +9,8 @@
 #include "InventoryMenuWidget.h"
 #include "PlayerCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FPressedReturn)
+
 class UCameraComponent;
 class IGrabbable;
 class UTimelineComponent;
@@ -86,46 +88,14 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* PickupItemAction;
 
+	/** Return Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ReturnAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 	TSubclassOf<UUserWidget> MainHUDClass;
-	UPROPERTY(EditAnywhere, Category = HUD)
-	TSubclassOf<UInventoryMenuWidget> InventoryMenuClass;
 
-private:
-	FVector2D LookAxis;
-	IGrabbable* GrabbedActor;
-	FOnTimelineFloat CrouchTimelineFloat;
-	APlayerController* PlayerController;
-	bool bIsPaused = false;
-	int CurrentPickupActorsNum = 0;
-
-	UInventoryMenuWidget* InventoryMenuWidget;
-
-	void Initialize();
-
-	//* Input *//
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void Interact();
-	void StartGrab();
-	void StopGrab();
-	void ToggleFlashlight();
-	void StartSprint();
-	void StopSprint();
-	void StartCrouch();
-	void StopCrouch();
-	void ToggleInventory();
-	void PickupItem();
-
-	AActor* LineTrace(float Length);
-
-	UFUNCTION()
-	void SetCapsuleHalfHeight(float Amount);
-
-	void HeadBob();
-
-	void CheckPickupContext();
 
 public:
 	// Sets default values for this character's properties
@@ -134,11 +104,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
 	float TraceLength = 400;
 
+	FPressedReturn PressedReturnEvent;
+
+	bool bIsInventoryOpen = false;
+
 	class APickupActor_Main* CurrentPickupItem;
+	class UExaminationWidget* ExaminationWidget;
+
 
 	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
 	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
-	inline UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
 	inline UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 	inline UInputMappingContext* GetInputMappingContext() const { return DefaultMappingContext; }
 	inline UInputMappingContext* GetPickupItemMappingContext() const { return PickupItemMappingContext; }
@@ -159,8 +134,41 @@ public:
 
 	inline FVector2D GetLookAxis() const { return LookAxis; }
 
-	UFUNCTION()
 	void EnterPickup();
-	UFUNCTION()
 	void LeavePickup();
+
+	// Toggle inventory action
+	void ToggleInventory();
+
+private:
+	FVector2D LookAxis;
+	IGrabbable* GrabbedActor;
+	FOnTimelineFloat CrouchTimelineFloat;
+	APlayerController* PlayerController;
+	int CurrentPickupActorsNum = 0;
+
+	void Initialize();
+
+	//* Input *//
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void Interact();
+	void StartGrab();
+	void StopGrab();
+	void ToggleFlashlight();
+	void StartSprint();
+	void StopSprint();
+	void StartCrouch();
+	void StopCrouch();
+	void PickupItem();
+	void Return();
+
+	AActor* LineTrace(float Length);
+
+	UFUNCTION()
+	void SetCapsuleHalfHeight(float Amount);
+
+	void HeadBob();
+
+	void CheckPickupContext();
 };

@@ -13,6 +13,7 @@ void UInventoryDropdownWidget::NativeConstruct()
 
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	UseButton->OnClicked.AddDynamic(this, &UInventoryDropdownWidget::UseItem);
+	ExamineButton->OnClicked.AddDynamic(this, &UInventoryDropdownWidget::ExamineItem);
 	DropButton->OnClicked.AddDynamic(this, &UInventoryDropdownWidget::DropItem);
 }
 
@@ -40,4 +41,9 @@ void UInventoryDropdownWidget::UseItem()
 void UInventoryDropdownWidget::DropItem()
 {
 	PlayerCharacter->GetInventoryComponent()->DropItem(SlotIndex);
+}
+
+void UInventoryDropdownWidget::ExamineItem()
+{
+	PlayerCharacter->GetInventoryComponent()->ExamineItem(SlotIndex);
 }

@@ -11,6 +11,8 @@
 #include "InventoryItem_Usable.h"
 #include "Camera/CameraComponent.h"
 #include "PickupActor_Main.h"
+#include "Examination.h"
+#include "InventoryMenuWidget.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -104,7 +106,7 @@ TSubclassOf<AInventoryItem_Main> UInventoryComponent::GetItemClassAtIndex(int In
 
 void UInventoryComponent::UpdateInventorySlot(int Index)
 {
-	UInventorySlotWidget* Slot = PlayerCharacter->GetInventoryMenuWidget()->InventoryGrid->GetSlotsArray()[Index];
+	UInventorySlotWidget* Slot = InventoryMenuWidget->InventoryGrid->GetSlotsArray()[Index];
 	if (Slot != nullptr)
 	{
 		Slot->UpdateSlot();
@@ -136,7 +138,15 @@ void UInventoryComponent::UseItem(int Index)
 	}
 	RemoveItem(Index);
 	// Close menu after removing the item
-	PlayerCharacter->GetInventoryMenuWidget()->CloseDropdownMenu();
+	PlayerCharacter->GetInventoryComponent()->GetInventoryMenuWidget()->CloseDropdownMenu();
+}
+
+void UInventoryComponent::ExamineItem(int Index)
+{
+	ExaminationWidget->UpdateWidget(Index);
+	InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	ExaminationWidget->AddToViewport(2);
+	PlayerCharacter->bIsInventoryOpen = false;
 }
 
 void UInventoryComponent::DropItem(int Index)
@@ -164,7 +174,7 @@ void UInventoryComponent::DropItem(int Index)
 	}
 	SpawnedActor->StaticMesh->SetSimulatePhysics(true);
 	RemoveItem(Index);
-	PlayerCharacter->GetInventoryMenuWidget()->CloseDropdownMenu();
+	PlayerCharacter->GetInventoryComponent()->GetInventoryMenuWidget()->CloseDropdownMenu();
 }
 
 
@@ -173,11 +183,50 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Initialize();
+	
+}
+
+void UInventoryComponent::Initialize()
+{
 	PlayerContr = Cast<AHG_PlayerController>(GetOwner()->GetInstigatorController());
 	PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 
 	InventorySlots.SetNum(PlayerContr->InventorySlots);
-	
+
+	if (InventoryMenuWidgetClass)
+	{
+		InventoryMenuWidget = CreateWidget<UInventoryMenuWidget>(PlayerContr, InventoryMenuWidgetClass);
+		InventoryMenuWidget->AddToViewport();
+		InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory menu widget class is missing"));
+	}
+	if (ExaminationWidgetClass)
+	{
+		ExaminationWidget = CreateWidget<UExaminationWidget>(PlayerContr, ExaminationWidgetClass);
+		ExaminationWidget->InitializeWidget(this);
+		PlayerCharacter->ExaminationWidget = ExaminationWidget;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Examination widget class is missing"));
+	}
+	if (ExaminationActorClass)
+	{
+		TArray<AActor*> outActors;
+		UGameplayStatics::GetAllActorsOfClass(this, ExaminationActorClass, outActors);
+		if (outActors.Num() > 0)
+		{
+			ExaminationActor = Cast<AExamination>(outActors[0]);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Examination actor class is missing"));
+	}
 }
 
 
@@ -214,4 +263,11 @@ int UInventoryComponent::CheckForFreeSlot(TSubclassOf<AInventoryItem_Main> ItemC
 
 	return -1;
 }
+
+//void UInventoryComponent::CreateExaminationWidget(int Index)
+//{
+//	ExaminationWidget->UpdateWidget(Index);
+//	InventoryMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+//	ExaminationWidget->AddToViewport(2);
+//}
 
