@@ -59,6 +59,7 @@ void APickupActor_Main::Initialize()
 	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 	PromptWidgetComponent->SetVisibility(false);
+	PromptWidgetComponent->SetWorldScale3D(FVector(0.03, 0.03, 0.03));
 }
 
 // Called every frame
