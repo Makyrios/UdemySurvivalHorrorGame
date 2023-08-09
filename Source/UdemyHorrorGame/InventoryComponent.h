@@ -66,6 +66,8 @@ public:
 	/// <param name="Index">Index of the slot</param>
 	void DropItem(int Index);
 
+	void ExpandInventory(int Amount);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -92,6 +94,7 @@ public:
 public:
 	inline class AExamination* GetExaminationActor() const { return ExaminationActor; }
 	inline class UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
+	inline const TArray<FInventoryItems>& GetInventorySlots() const { return InventorySlots; }
 
 private:
 	TArray<FInventoryItems> InventorySlots;
@@ -105,5 +108,4 @@ private:
 	int CheckForEmptySlot() const;
 	int CheckForFreeSlot(TSubclassOf<AInventoryItem_Main> ItemClass) const;
 
-	//void CreateExaminationWidget(int Index);
 };

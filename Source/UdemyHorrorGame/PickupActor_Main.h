@@ -34,6 +34,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void Initialize();
+
 	UPROPERTY(EditAnywhere, Category = Pickup)
 	float ArrowPromptLength = 300;
 	UPROPERTY(EditAnywhere, Category = Pickup)
@@ -53,15 +55,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Pickup();
+	virtual void Pickup();
 
 	inline FOnActorEnterPickup GetOnActorEnterPickup() const { return OnActorEnterPickup; }
 	inline FOnActorEnterPickup GetOnActorLeavePickup() const { return OnActorLeavePickup; }
 
-private:
+protected:
 	class APlayerCharacter* PlayerCharacter;
 	class APlayerController* PlayerContr;
 	class UPickupPromptWidget* PickupPromptWidget;
+
+private:
 	bool bIsPlayerOverlap = false;
 
 	FOnActorEnterPickup OnActorEnterPickup;

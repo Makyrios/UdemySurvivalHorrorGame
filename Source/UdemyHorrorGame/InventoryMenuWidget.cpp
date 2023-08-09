@@ -21,7 +21,7 @@ void UInventoryMenuWidget::OpenDropdownMenu(UInventorySlotWidget* SlotWidget)
 	UUniformGridSlot* GridSlot = Cast<UUniformGridSlot>(SlotWidget->Slot);
 	if (GridSlot == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No cast"));
+		UE_LOG(LogTemp, Warning, TEXT("Could not cast grid slot"));
 		return;
 	}
 	if (!PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(SlotWidget->GetIndex()).GetDefaultObject())
@@ -55,7 +55,7 @@ void UInventoryMenuWidget::ShowItemDetails(UInventorySlotWidget* SlotWidget)
 	FItemData ItemData;
 	UE_LOG(LogTemp, Display, TEXT("Index: %d"), SlotWidget->GetIndex());
 	AInventoryItem_Main* ItemObject = PlayerCharacter->GetInventoryComponent()->GetItemClassAtIndex(SlotWidget->GetIndex()).GetDefaultObject();
-	if (ItemObject)
+	if (ItemObject != nullptr)
 	{
 		ItemData = ItemObject->GetItemData();
 		NameText->SetText(FText::FromName(ItemData.ItemName));
@@ -69,15 +69,30 @@ void UInventoryMenuWidget::HideItemDetails()
 	DetailsVerticalBox->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void UInventoryMenuWidget::AddSlots(int SlotsAmount)
+{
+	InventoryGrid->AddSlots(SlotsAmount);
+	int SlotsArrayNum = InventoryGrid->GetSlotsArray().Num();
+	for (int i = SlotsArrayNum - 1; i >= SlotsArrayNum - SlotsAmount; i--)
+	{
+		InitializeSlotWidget(i);
+	}
+}
+
 void UInventoryMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	CloseDropdownMenuButton->OnClicked.AddDynamic(this, &UInventoryMenuWidget::CloseDropdownMenu);
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	CloseDropdownMenuButton->OnClicked.AddDynamic(this, &UInventoryMenuWidget::CloseDropdownMenu);
 
 	for (int i = 0; i < InventoryGrid->GetSlotsArray().Num(); i++)
 	{
-		InventoryGrid->GetSlotsArray()[i]->InitializeWidget(i, this);
+		InitializeSlotWidget(i);
 	}
+}
+
+void UInventoryMenuWidget::InitializeSlotWidget(int i)
+{
+	InventoryGrid->GetSlotsArray()[i]->InitializeWidget(i, this);
 }

@@ -178,6 +178,15 @@ void UInventoryComponent::DropItem(int Index)
 	PlayerCharacter->GetInventoryComponent()->GetInventoryMenuWidget()->CloseDropdownMenu();
 }
 
+void UInventoryComponent::ExpandInventory(int Amount)
+{
+	if (Amount > 0)
+	{
+		InventorySlots.SetNum(InventorySlots.Num() + Amount);
+		InventoryMenuWidget->AddSlots(Amount);
+	}
+}
+
 
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
@@ -190,8 +199,8 @@ void UInventoryComponent::BeginPlay()
 
 void UInventoryComponent::Initialize()
 {
-	PlayerContr = Cast<AHG_PlayerController>(GetOwner()->GetInstigatorController());
 	PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
+	PlayerContr = Cast<AHG_PlayerController>(GetOwner()->GetInstigatorController());
 
 	InventorySlots.SetNum(PlayerContr->InventorySlots);
 

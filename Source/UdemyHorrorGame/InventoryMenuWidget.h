@@ -53,16 +53,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* DescriptionText;
 
-
-	void OpenDropdownMenu(class UInventorySlotWidget* SlotWidget);
+public:
 	UFUNCTION()
 	void CloseDropdownMenu();
+	void OpenDropdownMenu(class UInventorySlotWidget* SlotWidget);
 
 	void ShowItemDetails(class UInventorySlotWidget* SlotWidget);
 	void HideItemDetails();
 
+	void AddSlots(int SlotsAmount);
+
 protected:
 	void NativeConstruct() override;
+
+	void InitializeSlotWidget(int i);
 
 private:
 	class APlayerCharacter* PlayerCharacter;

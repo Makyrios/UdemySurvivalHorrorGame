@@ -28,6 +28,10 @@ APickupActor_Main::APickupActor_Main()
 
 	PromptWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Prompt Widget"));
 	PromptWidgetComponent->SetupAttachment(StaticMesh);
+	PromptWidgetComponent->SetWidgetClass(LoadClass<UUserWidget>(NULL, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/PickupActors/WBP_PickupPromptWidget.WBP_PickupPromptWidget_C'")));
+
+	EPromptImage = LoadObject<UTexture2D>(NULL, TEXT("/Script/Engine.Texture2D'/Game/Textures/PickupItems/E_Prompt.E_Prompt'"));
+	ArrowPromptImage = LoadObject<UTexture2D>(NULL, TEXT("/Script/Engine.Texture2D'/Game/Textures/PickupItems/Arrow_Prompt.Arrow_Prompt'"));
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +39,11 @@ void APickupActor_Main::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Initialize();
+}
+
+void APickupActor_Main::Initialize()
+{
 	StaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
@@ -48,11 +57,8 @@ void APickupActor_Main::BeginPlay()
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &APickupActor_Main::SphereOnBeginOverlap);
 	Sphere->OnComponentEndOverlap.AddDynamic(this, &APickupActor_Main::SphereOnEndOverlap);
 	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-	
+
 	PromptWidgetComponent->SetVisibility(false);
-	//PromptWidgetComponent->SetRelativeLocation(FVector(0, 0, WidgetDistanceAboveMesh));
-
-
 }
 
 // Called every frame
@@ -61,6 +67,8 @@ void APickupActor_Main::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	PromptWidgetComponent->SetWorldLocation(FVector(StaticMesh->GetComponentLocation()) + FVector(0, 0, WidgetDistanceAboveMesh));
+
+	if (PlayerCharacter == nullptr) return;
 
 	if (bIsPlayerOverlap)
 	{

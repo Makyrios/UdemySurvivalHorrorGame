@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "InventorySlotWidget.h"
+#include "InventoryMenuWidget.h"
 #include "InventoryGridWidget.generated.h"
 
 /**
@@ -15,9 +16,13 @@ class UDEMYHORRORGAME_API UInventoryGridWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	// ??? Don't want AddSlots function to be public
+	friend UInventoryMenuWidget;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UUniformGridPanel* InventoryGridPanel;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	TSubclassOf<UInventorySlotWidget> SlotWidgetClass;
@@ -25,12 +30,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int SlotsPerRow = 4;
 
+private:
+	void AddSlots(int Amount);
+
+public:
 	TArray<class UInventorySlotWidget*> GetSlotsArray() const { return SlotsArray; }
 
 protected:
 	void NativeConstruct() override;
 
+	void CreateSlotWidget(int i);
+
 	TArray<class UInventorySlotWidget*> SlotsArray;
 
-
+	class APlayerCharacter* PlayerCharacter;
+	class AHG_PlayerController* PlayerContr;
+	UInventoryMenuWidget* InventoryMenu;
 };
