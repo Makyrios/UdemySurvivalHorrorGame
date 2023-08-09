@@ -40,6 +40,13 @@ void UFlashlightComponent::ToggleFlashlight()
 	}
 }
 
+void UFlashlightComponent::SetIntensity()
+{
+	TRange<float> BatteryLife {MinBatteryLevel, FlickeringLightThreshold};
+	TRange<float> IntensityRange {0, 1};
+	FlashlightLight->SetIESBrightnessScale(FMath::GetMappedRangeValueClamped<float>(BatteryLife, IntensityRange, CurrentBatteryLevel));
+}
+
 void UFlashlightComponent::AddBatteryLife(int Amount)
 {
 	CurrentBatteryLevel = FMath::Clamp(CurrentBatteryLevel + Amount, MinBatteryLevel, MaxBatteryLevel);
@@ -52,6 +59,11 @@ void UFlashlightComponent::DepleteBatteryLife()
 	{
 		FlashlightLight->SetVisibility(false);
 		GetWorld()->GetTimerManager().ClearTimer(DepletionTimerHandle);
+	}
+	// Flickering light
+	if (CurrentBatteryLevel <= FlickeringLightThreshold)
+	{
+		SetIntensity();
 	}
 }
 

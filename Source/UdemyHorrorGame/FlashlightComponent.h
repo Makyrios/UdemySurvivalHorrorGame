@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Flashlight)
 	float DepletionAmount = 1;
 
+	UPROPERTY(EditAnywhere, Category = Flashlight)
+	float FlickeringLightThreshold = 20;
+
 public:	
 	// Sets default values for this component's properties
 	UFlashlightComponent();
@@ -35,6 +38,8 @@ public:
 	void Initialize(class APlayerCharacter* PlayerCharRef);
 
 	void ToggleFlashlight();
+
+	void SetIntensity();
 
 	void AddBatteryLife(int Amount);
 	void DepleteBatteryLife();
