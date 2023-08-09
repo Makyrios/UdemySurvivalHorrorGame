@@ -29,14 +29,14 @@ void UMoveComponent::StartSprint()
 	{
 		SetMaxWalkSpeed(SprintSpeed);
 	}
-	GetWorld()->GetTimerManager().SetTimer(SprintTimerHandle, this, &UMoveComponent::SprintTimer, 0.1, true);
+	GetWorld()->GetTimerManager().SetTimer(SprintTimerHandle, this, &UMoveComponent::SprintTimer, StaminaConsumptionRate, true);
 }
 
 void UMoveComponent::StopSprint()
 {
 	GetWorld()->GetTimerManager().ClearTimer(SprintTimerHandle);
 	SetMaxWalkSpeed(WalkSpeed);
-	GetWorld()->GetTimerManager().SetTimer(RegenerateTimerHandle, this, &UMoveComponent::RegenerateStamina, 0.1, true, StaminaRegenerationDelay);
+	GetWorld()->GetTimerManager().SetTimer(RegenerateTimerHandle, this, &UMoveComponent::RegenerateStamina, StaminaConsumptionRate, true, StaminaRegenerationDelay);
 }
 
 void UMoveComponent::StartCrouch()

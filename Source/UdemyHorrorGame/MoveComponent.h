@@ -44,10 +44,10 @@ private:
 	void SetMaxWalkSpeed(float Speed);
 	float GetPlayerSpeed() const;
 
-	UFUNCTION()
+	//UFUNCTION()
 	void SprintTimer();
 
-	UFUNCTION()
+	//UFUNCTION()
 	void RegenerateStamina();
 
 private:
@@ -64,6 +64,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = Movement)
 	float CrouchSpeed = 300;
 
+	UPROPERTY(EditAnywhere, Category = Movement)
+	float StaminaConsumptionRate = 0.1;
 	UPROPERTY(EditAnywhere, Category = Movement)
 	float StaminaConsumption = 1;
 	UPROPERTY(EditAnywhere, Category = Movement)

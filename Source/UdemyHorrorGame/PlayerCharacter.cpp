@@ -16,6 +16,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "InventoryComponent.h"
 #include "PickupActor_Main.h"
+#include "FlashlightComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -33,10 +34,9 @@ APlayerCharacter::APlayerCharacter()
 	SpotlightComponent->SetupAttachment(SpringArmComponent);
 
 	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
-
 	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
-
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
+	FlashlightComponent = CreateDefaultSubobject<UFlashlightComponent>(TEXT("Flashlight Component"));
 }
 
 // Called when the game starts or when spawned
@@ -182,14 +182,7 @@ void APlayerCharacter::StopGrab()
 
 void APlayerCharacter::ToggleFlashlight()
 {
-	if (!SpotlightComponent->IsVisible())
-	{
-		SpotlightComponent->SetVisibility(true);
-	}
-	else
-	{
-		SpotlightComponent->SetVisibility(false);
-	}
+	FlashlightComponent->ToggleFlashlight();
 }
 
 void APlayerCharacter::StartSprint()
@@ -360,6 +353,8 @@ void APlayerCharacter::LeavePickup()
 
 void APlayerCharacter::Initialize()
 {
+	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
 	//HUD
 	if (MainHUDClass)
 	{
@@ -367,6 +362,7 @@ void APlayerCharacter::Initialize()
 		MainHUDWidget->AddToViewport();
 	}
 
+	//Mapping context
 	if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
 	{
 		//Add Input Mapping Context
@@ -389,6 +385,6 @@ void APlayerCharacter::Initialize()
 		CrouchTimelineComponent->AddInterpFloat(CrouchCurveFloat, CrouchTimelineFloat);
 	}
 
-	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
+	//Flashlight component
+	FlashlightComponent->Initialize(this);
 }
