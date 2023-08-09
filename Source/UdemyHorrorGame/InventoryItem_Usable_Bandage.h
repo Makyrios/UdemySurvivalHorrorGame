@@ -15,7 +15,7 @@ class UDEMYHORRORGAME_API AInventoryItem_Usable_Bandage : public AInventoryItem_
 	GENERATED_BODY()
 
 public:
-	void UseItem() override;
+	bool UseItem() override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Item)

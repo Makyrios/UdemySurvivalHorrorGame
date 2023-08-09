@@ -14,7 +14,11 @@ class UDEMYHORRORGAME_API AInventoryItem_FlashlightBattery : public AInventoryIt
 {
 	GENERATED_BODY()
 
+
 public:
-	void UseItem() override;
-	
+	bool UseItem() override;
+
+private:
+	UPROPERTY(EditAnywhere, Category = Battery)
+	float BatteryRegenAmount = 50;
 };

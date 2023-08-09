@@ -128,15 +128,19 @@ void UInventoryComponent::UseItem(int Index)
 		ItemActor = GetWorld()->SpawnActor(UsableItemClass);
 	}
 
+	bool bIsUsedItem = false;
 	if (IUsable* UsableItem = Cast<IUsable>(ItemActor))
 	{
-		UsableItem->UseItem();
+		bIsUsedItem = UsableItem->UseItem();
 	}
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("Could not cast to usable"));
 	}
-	RemoveItem(Index);
+	if (bIsUsedItem)
+	{
+		RemoveItem(Index);
+	}
 	// Close menu after removing the item
 	PlayerCharacter->GetInventoryComponent()->GetInventoryMenuWidget()->CloseDropdownMenu();
 }

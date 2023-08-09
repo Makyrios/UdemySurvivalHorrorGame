@@ -4,8 +4,17 @@
 
 
 #include "InventoryItem_Usable.h"
+#include "PlayerCharacter.h"
+#include <Kismet/GameplayStatics.h>
 
-void AInventoryItem_Usable::UseItem()
+bool AInventoryItem_Usable::UseItem()
 {
+	return true;
+}
 
+void AInventoryItem_Usable::BeginPlay()
+{
+	Super::BeginPlay();
+
+	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 }

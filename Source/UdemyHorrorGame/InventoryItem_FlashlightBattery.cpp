@@ -2,8 +2,17 @@
 
 
 #include "InventoryItem_FlashlightBattery.h"
+#include "PlayerCharacter.h"
+#include "FlashlightComponent.h"
 
-void AInventoryItem_FlashlightBattery::UseItem()
+bool AInventoryItem_FlashlightBattery::UseItem()
 {
 	UE_LOG(LogTemp, Display, TEXT("Flashlight battery use"));
+	UFlashlightComponent* FlashlightComp = PlayerCharacter->GetFlashlightComponent();
+	if (FlashlightComp->CurrentBatteryLevel < FlashlightComp->MaxBatteryLevel)
+	{
+		FlashlightComp->AddBatteryLife(BatteryRegenAmount); 
+		return true;
+	}
+	return false;
 }

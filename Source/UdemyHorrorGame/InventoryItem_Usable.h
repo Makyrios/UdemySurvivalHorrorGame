@@ -16,6 +16,10 @@ class UDEMYHORRORGAME_API AInventoryItem_Usable : public AInventoryItem_Main, pu
 	GENERATED_BODY()
 
 public:
-	void UseItem() override;
+	bool UseItem() override;
 	
+protected:
+	class APlayerCharacter* PlayerCharacter;
+
+	void BeginPlay() override;
 };
