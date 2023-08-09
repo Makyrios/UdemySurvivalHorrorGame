@@ -30,6 +30,10 @@ void UInventorySlotWidget::UpdateSlot()
 			AmountText->SetText(FText::AsNumber(Amount));
 			AmountText->SetVisibility(ESlateVisibility::Visible);
 		}
+		else
+		{
+			AmountText->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
