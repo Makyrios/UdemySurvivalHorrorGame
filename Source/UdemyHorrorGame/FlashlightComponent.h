@@ -29,7 +29,12 @@ public:
 	float DepletionAmount = 1;
 
 	UPROPERTY(EditAnywhere, Category = Flashlight)
-	float FlickeringLightThreshold = 20;
+	float FadingLightThreshold = 20;
+
+	UPROPERTY(EditAnywhere, Category = Flashlight)
+	float FlickeringLightThreshold = 10;
+	UPROPERTY(EditAnywhere, Category = Flashlight)
+	TObjectPtr<UMaterialInterface> FlickeringLightMaterial;
 
 public:	
 	// Sets default values for this component's properties
@@ -39,7 +44,6 @@ public:
 
 	void ToggleFlashlight();
 
-	void SetIntensity();
 
 	void AddBatteryLife(int Amount);
 	void DepleteBatteryLife();
@@ -58,4 +62,9 @@ private:
 	FTimerHandle DepletionTimerHandle;
 	class APlayerCharacter* PlayerCharacter;
 
+
+	void SetIntensity();
+
+	void FlickerLight();
+	void StopFlickerLight();
 };
