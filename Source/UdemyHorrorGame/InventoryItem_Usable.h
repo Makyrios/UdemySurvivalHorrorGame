@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InventoryItem_Main.h"
 #include "Usable.h"
+#include "PlayerCharacter.h"
 #include "InventoryItem_Usable.generated.h"
 
 /**
@@ -19,7 +20,7 @@ public:
 	bool UseItem() override;
 	
 protected:
-	class APlayerCharacter* PlayerCharacter;
+	APlayerCharacter* PlayerCharacter;
 
 	void BeginPlay() override;
 };

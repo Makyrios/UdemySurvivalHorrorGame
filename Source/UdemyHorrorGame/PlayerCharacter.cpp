@@ -17,6 +17,7 @@
 #include "InventoryComponent.h"
 #include "PickupActor_Main.h"
 #include "FlashlightComponent.h"
+#include "HealthComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -37,6 +38,7 @@ APlayerCharacter::APlayerCharacter()
 	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 	FlashlightComponent = CreateDefaultSubobject<UFlashlightComponent>(TEXT("Flashlight Component"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 // Called when the game starts or when spawned

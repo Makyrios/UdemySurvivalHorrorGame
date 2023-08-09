@@ -38,6 +38,8 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	class UInventoryComponent* InventoryComponent;
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class UFlashlightComponent* FlashlightComponent;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	class UHealthComponent* HealthComponent;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crouch")
@@ -117,6 +119,7 @@ public:
 	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
 	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	inline UFlashlightComponent* GetFlashlightComponent() const { return FlashlightComponent; }
+	inline UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	inline UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 	inline USpotLightComponent* GetSpotlightComponent() const { return SpotlightComponent; }
 	inline UInputMappingContext* GetInputMappingContext() const { return DefaultMappingContext; }

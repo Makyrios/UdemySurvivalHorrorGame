@@ -100,6 +100,5 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	UE_LOG(LogTemp, Display, TEXT("Battery life: %f"), CurrentBatteryLevel);
 }
 

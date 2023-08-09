@@ -2,7 +2,6 @@
 
 
 #include "InventoryItem_FlashlightBattery.h"
-#include "PlayerCharacter.h"
 #include "FlashlightComponent.h"
 
 bool AInventoryItem_FlashlightBattery::UseItem()

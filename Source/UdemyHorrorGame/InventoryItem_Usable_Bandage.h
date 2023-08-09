@@ -19,6 +19,6 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Item)
-	float HealAmount = 20;
+	float HealAmount = 25;
 	
 };
