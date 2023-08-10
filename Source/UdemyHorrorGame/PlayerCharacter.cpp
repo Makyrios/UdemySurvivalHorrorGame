@@ -18,6 +18,7 @@
 #include "PickupActor_Main.h"
 #include "FlashlightComponent.h"
 #include "HealthComponent.h"
+#include "MainHUDWidget.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -360,7 +361,8 @@ void APlayerCharacter::Initialize()
 	//HUD
 	if (MainHUDClass)
 	{
-		UUserWidget* MainHUDWidget = CreateWidget<UUserWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
+		UMainHUDWidget* MainHUDWidget = CreateWidget<UMainHUDWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
+		MainHUDWidget->InitializeWidget(this);
 		MainHUDWidget->AddToViewport();
 	}
 

@@ -14,6 +14,33 @@ class UDEMYHORRORGAME_API UMoveComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float WalkSpeed = 500;
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float SprintSpeed = 800;
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float CrouchSpeed = 300;
+
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float StaminaConsumptionRate = 0.1;
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float StaminaConsumption = 1;
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float StaminaRegenerationRate = 1.5;
+
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float StaminaRegenerationDelay = 5;
+
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float MaxStamina = 100;
+	UPROPERTY(EditAnywhere, Category = Movement)
+		float MinStamina = 0;
+
+	UPROPERTY(EditAnywhere, Category = Crouch)
+		float CrouchingSpeed = 200;
+	UPROPERTY(EditAnywhere, Category = Crouch)
+		float CrouchHalfHeight = 44;
 
 public:	
 	// Sets default values for this component's properties
@@ -39,6 +66,7 @@ public:
 	inline float GetCrouchHalfHeight() const { return CrouchHalfHeight; }
 	inline float GetWalkSpeed() const { return WalkSpeed; }
 	inline float GetSprintSpeed() const { return SprintSpeed; }
+	inline float GetCurrentStamina() const { return CurrentStamina; }
 
 private:
 	void SetMaxWalkSpeed(float Speed);
@@ -56,32 +84,7 @@ private:
 	bool bIsCrouching = false;
 
 	class APlayerCharacter* PlayerCharacter;
-		
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float WalkSpeed = 500;
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float SprintSpeed = 800;
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float CrouchSpeed = 300;
 
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float StaminaConsumptionRate = 0.1;
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float StaminaConsumption = 1;
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float StaminaRegenerationRate = 1.5;
-
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float StaminaRegenerationDelay = 5;
-	
-	UPROPERTY(EditAnywhere, Category = Movement)
-	float MaxStamina = 100;
-	UPROPERTY(EditAnywhere, Category = Crouch)
-	float CrouchingSpeed = 200;
-	UPROPERTY(EditAnywhere, Category = Crouch)
-	float CrouchHalfHeight = 44;
-
-	float MinStamina = 0;
 	float CurrentStamina = MaxStamina;
 	
 };

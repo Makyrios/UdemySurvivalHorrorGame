@@ -19,7 +19,6 @@ private:
 public:
 	UPROPERTY(EditAnywhere, Category = Flashlight)
 	float MaxBatteryLevel = 100;
-	float CurrentBatteryLevel = MaxBatteryLevel;
 	UPROPERTY(EditAnywhere, Category = Flashlight)
 	float MinBatteryLevel = 0;
 
@@ -56,9 +55,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	inline float GetCurrentBatteryLevel() const { return CurrentBatteryLevel; }
+
 public:
 
 private:
+	float CurrentBatteryLevel = MaxBatteryLevel;
+
 	FTimerHandle DepletionTimerHandle;
 	class APlayerCharacter* PlayerCharacter;
 

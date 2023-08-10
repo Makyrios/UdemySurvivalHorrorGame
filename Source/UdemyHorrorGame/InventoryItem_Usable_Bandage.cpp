@@ -10,7 +10,7 @@ bool AInventoryItem_Usable_Bandage::UseItem()
 	// Implement healing
 	UE_LOG(LogTemp, Display, TEXT("Heal for %f HP"), HealAmount);
 	UHealthComponent* HealthComponent = PlayerCharacter->GetHealthComponent();
-	if (HealthComponent->CurrentHealth < HealthComponent->MaxHealth)
+	if (HealthComponent->GetCurrentHealth() < HealthComponent->MaxHealth)
 	{
 		HealthComponent->ChangeHealth(HealAmount);
 		return true;
