@@ -18,6 +18,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = Health)
 	float MinHealth = 0;
 
+	UPROPERTY(EditAnywhere, Category = Health, meta = (ClampMin = "0", ClampMax = "1"))
+	float BloodScreenActivationPercent = 0.7;
+
+
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
@@ -25,6 +29,8 @@ public:
 	void ChangeHealth(float Amount);
 
 	inline float GetCurrentHealth() const { return CurrentHealth; }
+
+	void UpdateBloodScreen();
 
 protected:
 	// Called when the game starts
@@ -35,5 +41,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	class UMaterialParameterCollection* BloodScreenMaterialCollection;
+
 	float CurrentHealth = MaxHealth;
 };

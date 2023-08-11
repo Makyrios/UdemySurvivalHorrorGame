@@ -11,12 +11,6 @@
 void UProgressBarsWidget::InitializeWidget(APlayerCharacter* PlayerCharacterRef)
 {
 	PlayerCharacter = PlayerCharacterRef;
-	/*UHealthComponent* HealthComp = PlayerCharacter->GetHealthComponent();
-	UMoveComponent* MoveComp = PlayerCharacter->GetMoveComponent();
-	UFlashlightComponent* FlashlightComp = PlayerCharacter->GetFlashlightComponent();
-	HealthBar->SetPercent((HealthComp->GetCurrentHealth() - HealthComp->MinHealth) / PlayerCharacter->GetHealthComponent()->MaxHealth);
-	StaminaBar->SetPercent((MoveComp->GetCurrentStamina() - HealthComp->MinHealth) / PlayerCharacter->GetMoveComponent()->MaxStamina);
-	BatteryBar->SetPercent((FlashlightComp->GetCurrentBatteryLevel() - FlashlightComp->MinBatteryLevel) / PlayerCharacter->GetFlashlightComponent()->MaxBatteryLevel);*/
 }
 
 float UProgressBarsWidget::BindHealthBar()
