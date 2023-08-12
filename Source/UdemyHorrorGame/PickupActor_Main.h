@@ -8,26 +8,23 @@
 #include "InventoryItem_Main.h"
 #include "PickupActor_Main.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnActorEnterPickup)
-DECLARE_MULTICAST_DELEGATE(FOnActorLeavePickup)
-
 
 UCLASS()
 class UDEMYHORRORGAME_API APickupActor_Main : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	APickupActor_Main();
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* StaticMesh;
+		UStaticMeshComponent* StaticMesh;
 	UPROPERTY(EditAnywhere)
-	class USphereComponent* Sphere;
+		class USphereComponent* Sphere;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
-	class UWidgetComponent* PromptWidgetComponent;
+		class UWidgetComponent* PromptWidgetComponent;
 
 
 protected:
@@ -37,28 +34,25 @@ protected:
 	void Initialize();
 
 	UPROPERTY(EditAnywhere, Category = Pickup)
-	float ArrowPromptLength = 300;
+		float ArrowPromptLength = 300;
 	UPROPERTY(EditAnywhere, Category = Pickup)
-	float PickupPromptLength = 200;
+		float PickupPromptLength = 200;
 
 	UPROPERTY(EditAnywhere, Category = Pickup)
-	float WidgetDistanceAboveMesh = 100;
+		float WidgetDistanceAboveMesh = 100;
 
 	UFUNCTION()
-	void SphereOnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void SphereOnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void SphereOnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		void SphereOnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Pickup();
-
-	inline FOnActorEnterPickup GetOnActorEnterPickup() const { return OnActorEnterPickup; }
-	inline FOnActorEnterPickup GetOnActorLeavePickup() const { return OnActorLeavePickup; }
 
 protected:
 	class APlayerCharacter* PlayerCharacter;
@@ -68,20 +62,17 @@ protected:
 private:
 	bool bIsPlayerOverlap = false;
 
-	FOnActorEnterPickup OnActorEnterPickup;
-	FOnActorLeavePickup OnActorLeavePickup;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+		UTexture2D* EPromptImage;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	UTexture2D* EPromptImage;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	UTexture2D* ArrowPromptImage;
-	
-	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AInventoryItem_Main> Item;
+		UTexture2D* ArrowPromptImage;
 
 	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
-	int Amount;
+		TSubclassOf<AInventoryItem_Main> Item;
+
+	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
+		int Amount;
 
 	void TogglePrompt(bool bCanPickup);
 };

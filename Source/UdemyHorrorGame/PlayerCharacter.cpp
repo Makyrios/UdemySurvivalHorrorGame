@@ -23,7 +23,7 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
@@ -31,6 +31,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	CameraComponent->SetupAttachment(RootComponent);
+	CameraComponent->bUsePawnControlRotation = true;
 
 	SpotlightComponent = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spotlight Component"));
 	SpotlightComponent->SetupAttachment(SpringArmComponent);
@@ -42,6 +43,18 @@ APlayerCharacter::APlayerCharacter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
+void APlayerCharacter::AddPickupItem(APickupActor_Main* PickUpItem)
+{
+	CurrentPickupItems.AddUnique(PickUpItem);
+	CheckPickupContext();
+}
+
+void APlayerCharacter::RemovePickupItem(APickupActor_Main* PickUpItem)
+{
+	CurrentPickupItems.Remove(PickUpItem);
+	CheckPickupContext();
+}
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
@@ -49,7 +62,7 @@ void APlayerCharacter::BeginPlay()
 
 	MoveComponent->Initialize(this);
 	Initialize();
-	
+
 }
 
 // Called every frame
@@ -65,7 +78,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
 
 		//Look
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
@@ -119,19 +133,9 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
 		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 	HeadBob();
 }
@@ -146,7 +150,7 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(-LookAxisVector.Y);
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
 
@@ -158,7 +162,7 @@ void APlayerCharacter::Interact()
 		InteractActor->Interact();
 	}
 	// After interact update pickup context
-	if (CurrentPickupActorsNum > 0)
+	if (CurrentPickupItems.Num() > 0)
 	{
 		CheckPickupContext();
 	}
@@ -208,6 +212,7 @@ void APlayerCharacter::StopCrouch()
 	MoveComponent->StopCrouch();
 }
 
+
 void APlayerCharacter::ToggleInventory()
 {
 	UInventoryMenuWidget* InventoryMenu = InventoryComponent->GetInventoryMenuWidget();
@@ -239,29 +244,31 @@ void APlayerCharacter::ToggleInventory()
 		InventoryMenu->CloseDropdownMenu();
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
-	
+
 }
 
 void APlayerCharacter::PickupItem()
 {
-	if (CurrentPickupItem != nullptr)
+	if (CurrentPickupItems.Num() > 0)
 	{
 		// If player looking at an interactable actor, then interacting with it will be prioritized
 		// Otherwise pickup actor
 		if (Cast<IInteractable>(LineTrace(TraceLength)))
 		{
-			if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
-			{
-				if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
-				{
-					Subsystem->RemoveMappingContext(PickupItemMappingContext);
-					Subsystem->AddMappingContext(DefaultMappingContext, 0);
-				}
-			}
+			//if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+			//{
+			//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+			//	{
+			//		Subsystem->RemoveMappingContext(PickupItemMappingContext);
+			//		//Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			//	}
+			//}
 			Interact();
-			return;
 		}
-		CurrentPickupItem->Pickup();
+		else
+		{
+			CurrentPickupItems.Top()->Pickup();
+		}
 	}
 }
 
@@ -316,47 +323,36 @@ void APlayerCharacter::HeadBob()
 
 void APlayerCharacter::CheckPickupContext()
 {
-	if (CurrentPickupActorsNum >= 1)
+	if (CurrentPickupItems.Num() > 0)
 	{
 		if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
 			{
-				Subsystem->RemoveMappingContext(DefaultMappingContext);
+				//Subsystem->RemoveMappingContext(DefaultMappingContext);
 				Subsystem->AddMappingContext(PickupItemMappingContext, 1);
 			}
 		}
 	}
-	else if (CurrentPickupActorsNum <= 0)
+	else
 	{
 		if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
 			{
 				Subsystem->RemoveMappingContext(PickupItemMappingContext);
-				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+				//Subsystem->AddMappingContext(DefaultMappingContext, 0);
 			}
 		}
-		CurrentPickupActorsNum = 0;
 	}
 }
 
-void APlayerCharacter::EnterPickup()
-{
-	UE_LOG(LogTemp, Display, TEXT("Enter pickup"));
-	CurrentPickupActorsNum++;
-	CheckPickupContext();
-}
 
-void APlayerCharacter::LeavePickup()
-{
-	CurrentPickupActorsNum--;
-	CheckPickupContext();
-}
 
 void APlayerCharacter::Initialize()
 {
 	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
 
 	//HUD
 	if (MainHUDClass)
@@ -375,7 +371,7 @@ void APlayerCharacter::Initialize()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+
 
 	//Crouch timeline
 	if (CrouchCurveFloat != nullptr)

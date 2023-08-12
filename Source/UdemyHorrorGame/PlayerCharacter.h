@@ -20,30 +20,30 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	//* Components
+		//* Components
+		UPROPERTY(EditAnywhere, Category = "Camera")
+		class USpringArmComponent* SpringArmComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	class USpringArmComponent* SpringArmComponent;
+		class UCameraComponent* CameraComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	class UCameraComponent* CameraComponent;
+		class USpotLightComponent* SpotlightComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	class USpotLightComponent* SpotlightComponent;
+		TSubclassOf<UCameraShakeBase> WalkHeadBob;
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	TSubclassOf<UCameraShakeBase> WalkHeadBob;
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	TSubclassOf<UCameraShakeBase> RunHeadBob;
+		TSubclassOf<UCameraShakeBase> RunHeadBob;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-	class UMoveComponent* MoveComponent;
+		class UMoveComponent* MoveComponent;
 	UPROPERTY(EditAnywhere, Category = "Components")
-	class UInventoryComponent* InventoryComponent;
+		class UInventoryComponent* InventoryComponent;
 	UPROPERTY(EditAnywhere, Category = "Components")
-	class UFlashlightComponent* FlashlightComponent;
+		class UFlashlightComponent* FlashlightComponent;
 	UPROPERTY(EditAnywhere, Category = "Components")
-	class UHealthComponent* HealthComponent;
+		class UHealthComponent* HealthComponent;
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Crouch")
-	UCurveFloat* CrouchCurveFloat;
+		UCurveFloat* CrouchCurveFloat;
 
 	UTimelineComponent* CrouchTimelineComponent;
 
@@ -51,10 +51,10 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
+		class UInputMappingContext* DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* PickupItemMappingContext;
+		class UInputMappingContext* PickupItemMappingContext;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -98,7 +98,7 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 
 
 	UPROPERTY(EditAnywhere, Category = HUD)
-	TSubclassOf<UUserWidget> MainHUDClass;
+		TSubclassOf<UUserWidget> MainHUDClass;
 
 
 public:
@@ -106,13 +106,12 @@ public:
 	APlayerCharacter();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
-	float TraceLength = 400;
+		float TraceLength = 400;
 
 	FPressedReturn PressedReturnEvent;
 
 	bool bIsInventoryOpen = false;
 
-	class APickupActor_Main* CurrentPickupItem;
 	class UExaminationWidget* ExaminationWidget;
 
 
@@ -125,11 +124,14 @@ public:
 	inline UInputMappingContext* GetInputMappingContext() const { return DefaultMappingContext; }
 	inline UInputMappingContext* GetPickupItemMappingContext() const { return PickupItemMappingContext; }
 
+	void AddPickupItem(class APickupActor_Main* PickUpItem);
+	void RemovePickupItem(class APickupActor_Main* PickUpItem);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -141,18 +143,17 @@ public:
 
 	inline FVector2D GetLookAxis() const { return LookAxis; }
 
-	void EnterPickup();
-	void LeavePickup();
-
 	// Toggle inventory action
 	void ToggleInventory();
+
+	void CheckPickupContext();
 
 private:
 	FVector2D LookAxis;
 	IGrabbable* GrabbedActor;
 	FOnTimelineFloat CrouchTimelineFloat;
 	APlayerController* PlayerController;
-	int CurrentPickupActorsNum = 0;
+	TArray<class APickupActor_Main*> CurrentPickupItems;
 
 	void Initialize();
 
@@ -177,5 +178,4 @@ private:
 
 	void HeadBob();
 
-	void CheckPickupContext();
 };

@@ -15,7 +15,7 @@
 // Sets default values
 APickupActor_Main::APickupActor_Main()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
@@ -49,9 +49,6 @@ void APickupActor_Main::Initialize()
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	PickupPromptWidget = Cast<UPickupPromptWidget>(PromptWidgetComponent->GetWidget());
 	PlayerContr = UGameplayStatics::GetPlayerController(this, 0);
-
-	OnActorEnterPickup.AddUObject(PlayerCharacter, &APlayerCharacter::EnterPickup);
-	OnActorLeavePickup.AddUObject(PlayerCharacter, &APlayerCharacter::LeavePickup);
 
 	Sphere->SetSphereRadius(ArrowPromptLength);
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &APickupActor_Main::SphereOnBeginOverlap);
@@ -87,12 +84,14 @@ void APickupActor_Main::Tick(float DeltaTime)
 		else
 		{
 			PromptWidgetComponent->SetVisibility(false);
+			PlayerCharacter->RemovePickupItem(this);
+			//OnPickupBlock.Broadcast();
 			return;
 		}
 		if ((PlayerCharacter->GetActorLocation() - GetActorLocation()).Size() <= PickupPromptLength)
 		{
 			TogglePrompt(true);
-			PlayerCharacter->CurrentPickupItem = this;	
+			PlayerCharacter->AddPickupItem(this);
 		}
 		else
 		{
@@ -112,6 +111,7 @@ void APickupActor_Main::Pickup()
 		if (Remainder == 0)
 		{
 			Destroy();
+			PlayerCharacter->RemovePickupItem(this);
 		}
 	}
 }
@@ -132,7 +132,6 @@ void APickupActor_Main::SphereOnBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	if (OtherActor->IsA<APlayerCharacter>())
 	{
-		OnActorEnterPickup.Broadcast();
 		PromptWidgetComponent->SetVisibility(true);
 		bIsPlayerOverlap = true;
 	}
@@ -143,9 +142,6 @@ void APickupActor_Main::SphereOnEndOverlap(UPrimitiveComponent* OverlappedCompon
 	if (OtherActor->IsA<APlayerCharacter>())
 	{
 		PromptWidgetComponent->SetVisibility(false);
-		OnActorLeavePickup.Broadcast();
 		bIsPlayerOverlap = false;
 	}
 }
-
-
