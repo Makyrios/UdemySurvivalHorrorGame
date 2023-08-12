@@ -86,7 +86,7 @@ void UMoveComponent::SprintTimer()
 {
 	UE_LOG(LogTemp, Display, TEXT("Sprint %f"), CurrentStamina);
 	// Player staying still
-	if (GetPlayerSpeed() == 0) return;
+	if (GetPlayerSpeed() <= 1) return;
 	if (CurrentStamina > MinStamina)
 	{
 		CurrentStamina = FMath::Clamp(CurrentStamina - StaminaConsumption, MinStamina, MaxStamina);
