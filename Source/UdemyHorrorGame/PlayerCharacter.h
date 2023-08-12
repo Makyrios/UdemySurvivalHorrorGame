@@ -111,6 +111,8 @@ public:
 	FPressedReturn PressedReturnEvent;
 
 	bool bIsInventoryOpen = false;
+	bool bIsHiding = false;
+	bool bCanOpenInventory = true;
 
 	class UExaminationWidget* ExaminationWidget;
 

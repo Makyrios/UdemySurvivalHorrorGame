@@ -215,6 +215,8 @@ void APlayerCharacter::StopCrouch()
 
 void APlayerCharacter::ToggleInventory()
 {
+	if (!bCanOpenInventory) return;
+
 	UInventoryMenuWidget* InventoryMenu = InventoryComponent->GetInventoryMenuWidget();
 	if (!bIsInventoryOpen)
 	{
