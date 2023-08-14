@@ -26,12 +26,12 @@ APlayerCharacter::APlayerCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	CameraComponent->SetupAttachment(RootComponent);
 	CameraComponent->bUsePawnControlRotation = true;
+
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
+	SpringArmComponent->SetupAttachment(CameraComponent);
 
 	SpotlightComponent = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spotlight Component"));
 	SpotlightComponent->SetupAttachment(SpringArmComponent);
@@ -53,6 +53,20 @@ void APlayerCharacter::RemovePickupItem(APickupActor_Main* PickUpItem)
 {
 	CurrentPickupItems.Remove(PickUpItem);
 	CheckPickupContext();
+}
+
+void APlayerCharacter::ToggleHUD()
+{
+	if (!MainHUDWidget) return;
+
+	if (MainHUDWidget->IsVisible())
+	{
+		MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		MainHUDWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -108,10 +122,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Toggle Inventory
 		EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Completed, this, &APlayerCharacter::ToggleInventory);
 
-		//Pickup Item
+		//Return
+		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &APlayerCharacter::Return);
+
+		//Pickup Item Context
 		EnhancedInputComponent->BindAction(PickupItemAction, ETriggerEvent::Completed, this, &APlayerCharacter::PickupItem);
 
-		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &APlayerCharacter::Return);
+		// LMB Action
+		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Started, this, &APlayerCharacter::LMBPress);
+		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Completed, this, &APlayerCharacter::LMBRelease);
+
 	}
 }
 
@@ -279,6 +299,16 @@ void APlayerCharacter::Return()
 	PressedReturnEvent.Broadcast();
 }
 
+void APlayerCharacter::LMBPress()
+{
+	LMBPressedEvent.Broadcast();
+}
+
+void APlayerCharacter::LMBRelease()
+{
+	LMBReleasedEvent.Broadcast();
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -349,6 +379,27 @@ void APlayerCharacter::CheckPickupContext()
 	}
 }
 
+void APlayerCharacter::OnEnterLockView()
+{
+	if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(LockViewMappingContext, 1);
+		}
+	}
+}
+
+void APlayerCharacter::OnExitLockView()
+{
+	if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(LockViewMappingContext);
+		}
+	}
+}
 
 
 void APlayerCharacter::Initialize()
@@ -359,7 +410,7 @@ void APlayerCharacter::Initialize()
 	//HUD
 	if (MainHUDClass)
 	{
-		UMainHUDWidget* MainHUDWidget = CreateWidget<UMainHUDWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
+		MainHUDWidget = CreateWidget<UMainHUDWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
 		MainHUDWidget->InitializeWidget(this);
 		MainHUDWidget->AddToViewport();
 	}

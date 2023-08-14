@@ -10,6 +10,9 @@
 #include "PlayerCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FPressedReturn)
+DECLARE_MULTICAST_DELEGATE(FLMBPressed)
+DECLARE_MULTICAST_DELEGATE(FLMBReleased)
+
 
 class UCameraComponent;
 class IGrabbable;
@@ -56,6 +59,9 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputMappingContext* PickupItemMappingContext;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputMappingContext* LockViewMappingContext;
+
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* MoveAction;
@@ -96,6 +102,10 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* ReturnAction;
 
+	/** LMB Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* LMBAction;
+
 
 	UPROPERTY(EditAnywhere, Category = HUD)
 		TSubclassOf<UUserWidget> MainHUDClass;
@@ -109,6 +119,8 @@ public:
 		float TraceLength = 400;
 
 	FPressedReturn PressedReturnEvent;
+	FLMBPressed LMBPressedEvent;
+	FLMBReleased LMBReleasedEvent;
 
 	bool bIsInventoryOpen = false;
 	bool bIsHiding = false;
@@ -128,6 +140,8 @@ public:
 
 	void AddPickupItem(class APickupActor_Main* PickUpItem);
 	void RemovePickupItem(class APickupActor_Main* PickUpItem);
+
+	void ToggleHUD();
 
 protected:
 	// Called when the game starts or when spawned
@@ -149,6 +163,8 @@ public:
 	void ToggleInventory();
 
 	void CheckPickupContext();
+	void OnEnterLockView();
+	void OnExitLockView();
 
 private:
 	FVector2D LookAxis;
@@ -156,6 +172,8 @@ private:
 	FOnTimelineFloat CrouchTimelineFloat;
 	APlayerController* PlayerController;
 	TArray<class APickupActor_Main*> CurrentPickupItems;
+
+	class UMainHUDWidget* MainHUDWidget;
 
 	void Initialize();
 
@@ -172,6 +190,8 @@ private:
 	void StopCrouch();
 	void PickupItem();
 	void Return();
+	void LMBPress();
+	void LMBRelease();
 
 	AActor* LineTrace(float Length);
 

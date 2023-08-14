@@ -33,7 +33,7 @@ void AGrabActor_PhysicsDoor::Tick(float DeltaTime)
 	if (bIsGrabbed)
 	{
 		FVector2D LookAxis = PlayerCharacter->GetLookAxis();
-		FVector Force(LookAxis.Y * ForceMultiplier, LookAxis.X * ForceMultiplier, 0);
+		FVector Force(LookAxis.Y * ForceMultiplier * -1, LookAxis.X * ForceMultiplier, 0);
 		MoveDoor(Force);
 	}
 }
