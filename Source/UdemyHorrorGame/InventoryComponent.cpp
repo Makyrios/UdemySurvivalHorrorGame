@@ -12,7 +12,10 @@
 #include "Camera/CameraComponent.h"
 #include "PickupActor_Main.h"
 #include "Examination.h"
+#include "NoteExamination.h"
 #include "InventoryMenuWidget.h"
+#include "Note_Main.h"
+
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -154,6 +157,17 @@ void UInventoryComponent::ExamineItem(int Index)
 	PlayerCharacter->bIsInventoryOpen = false;
 }
 
+void UInventoryComponent::ExamineItem(ANote_Main* NoteActor)
+{
+	if (NoteActor == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pickup Actor is null"));
+		return;
+	}
+	NoteExaminationWidget->UpdateWidget(NoteActor);
+	NoteExaminationWidget->AddToViewport(2);
+}
+
 void UInventoryComponent::DropItem(int Index)
 {
 	TSubclassOf<AInventoryItem_Main> ItemClass = GetItemClassAtIndex(Index);
@@ -224,6 +238,12 @@ void UInventoryComponent::Initialize()
 		ExaminationWidget->InitializeWidget(this);
 		PlayerCharacter->ExaminationWidget = ExaminationWidget;
 	}
+	if (NoteExaminationWidgetClass)
+	{
+		NoteExaminationWidget = CreateWidget<UNoteExaminationWidget>(PlayerContr, NoteExaminationWidgetClass);
+		NoteExaminationWidget->InitializeWidget(this);
+		PlayerCharacter->NoteExaminationWidget = NoteExaminationWidget;
+	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Examination widget class is missing"));
@@ -240,6 +260,19 @@ void UInventoryComponent::Initialize()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Examination actor class is missing"));
+	}
+	if (NoteExaminationActorClass)
+	{
+		TArray<AActor*> outActors;
+		UGameplayStatics::GetAllActorsOfClass(this, NoteExaminationActorClass, outActors);
+		if (outActors.Num() > 0)
+		{
+			NoteExaminationActor = Cast<ANoteExamination>(outActors[0]);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Note examination actor class is missing"));
 	}
 }
 

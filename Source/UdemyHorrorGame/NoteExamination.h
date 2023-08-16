@@ -4,20 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Examination.generated.h"
+#include "NoteExamination.generated.h"
 
 UCLASS()
-class UDEMYHORRORGAME_API AExamination : public AActor
+class UDEMYHORRORGAME_API ANoteExamination : public AActor
 {
 	GENERATED_BODY()
 
 protected:
 	UPROPERTY(EditAnywhere, Category = Components)
 	class UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(EditAnywhere, Category = Components)
+	class UTextRenderComponent* FrontTextRenderComponent;
+	UPROPERTY(EditAnywhere, Category = Components)
+	class UTextRenderComponent* BackTextRenderComponent;
 	
 public:	
 	// Sets default values for this actor's properties
-	AExamination();
+	ANoteExamination();
+
+	void SetFrontText(FText& Text);
+	void SetBackText(FText& Text);
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,7 +38,4 @@ public:
 
 public:
 	inline UStaticMeshComponent* GetItemMesh() const { return ItemMesh; }
-
-private:
-
 };

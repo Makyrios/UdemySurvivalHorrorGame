@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryItems.h"
 #include "ExaminationWidget.h"
+#include "NoteExaminationWidget.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -59,6 +60,7 @@ public:
 	/// </summary>
 	/// <param name="Index">Index of the slot</param>
 	void ExamineItem(int Index);
+	void ExamineItem(class ANote_Main* NoteActor);
 
 	/// <summary>
 	/// Drop item from inventory
@@ -89,10 +91,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	TSubclassOf<UExaminationWidget> ExaminationWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<UNoteExaminationWidget> NoteExaminationWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	TSubclassOf<AActor> ExaminationActorClass;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<AActor> NoteExaminationActorClass;
 
 public:
 	inline class AExamination* GetExaminationActor() const { return ExaminationActor; }
+	inline class ANoteExamination* GetNoteExaminationActor() const { return NoteExaminationActor; }
 	inline class UInventoryMenuWidget* GetInventoryMenuWidget() const { return InventoryMenuWidget; }
 	inline const TArray<FInventoryItems>& GetInventorySlots() const { return InventorySlots; }
 
@@ -103,7 +110,9 @@ private:
 	class APlayerCharacter* PlayerCharacter;
 	class UInventoryMenuWidget* InventoryMenuWidget;
 	class UExaminationWidget* ExaminationWidget;
+	class UNoteExaminationWidget* NoteExaminationWidget;
 	class AExamination* ExaminationActor;
+	class ANoteExamination* NoteExaminationActor;
 
 	int CheckForEmptySlot() const;
 	int CheckForFreeSlot(TSubclassOf<AInventoryItem_Main> ItemClass) const;

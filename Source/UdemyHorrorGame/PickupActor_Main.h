@@ -18,12 +18,12 @@ public:
 	// Sets default values for this actor's properties
 	APickupActor_Main();
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = Components)
 		UStaticMeshComponent* StaticMesh;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = Components)
 		class USphereComponent* Sphere;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = HUD)
 		class UWidgetComponent* PromptWidgetComponent;
 
 
@@ -32,6 +32,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Initialize();
+
+	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AInventoryItem_Main> Item;
+
+	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
+		int Amount;
 
 	UPROPERTY(EditAnywhere, Category = Pickup)
 		float ArrowPromptLength = 300;
@@ -67,12 +73,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 		UTexture2D* ArrowPromptImage;
-
-	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AInventoryItem_Main> Item;
-
-	UPROPERTY(EditAnywhere, Category = Item, meta = (AllowPrivateAccess = "true"))
-		int Amount;
 
 	void TogglePrompt(bool bCanPickup);
 };

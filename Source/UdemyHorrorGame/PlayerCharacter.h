@@ -127,7 +127,7 @@ public:
 	bool bCanOpenInventory = true;
 
 	class UExaminationWidget* ExaminationWidget;
-
+	class UNoteExaminationWidget* NoteExaminationWidget;
 
 	inline UMoveComponent* GetMoveComponent() const { return MoveComponent; }
 	inline UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }

@@ -19,7 +19,6 @@ APickupActor_Main::APickupActor_Main()
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
-	RootComponent = StaticMesh;
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
 	Sphere->SetupAttachment(StaticMesh);
@@ -75,9 +74,9 @@ void APickupActor_Main::Tick(float DeltaTime)
 		FVector End = GetActorLocation();
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(PlayerCharacter);
-		Params.AddIgnoredActor(this);
 		bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, Params);
-		if (!bWasHit)
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor == this)
 		{
 			PromptWidgetComponent->SetVisibility(true);
 		}
@@ -85,7 +84,6 @@ void APickupActor_Main::Tick(float DeltaTime)
 		{
 			PromptWidgetComponent->SetVisibility(false);
 			PlayerCharacter->RemovePickupItem(this);
-			//OnPickupBlock.Broadcast();
 			return;
 		}
 		if ((PlayerCharacter->GetActorLocation() - GetActorLocation()).Size() <= PickupPromptLength)
