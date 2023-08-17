@@ -24,7 +24,7 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 		//* Components
-		UPROPERTY(EditAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Camera")
 		class USpringArmComponent* SpringArmComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		class UCameraComponent* CameraComponent;

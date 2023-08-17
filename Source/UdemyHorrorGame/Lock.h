@@ -62,6 +62,7 @@ private:
 	TArray<class ALockDial*> Dials;
 
 	bool bIsUnlocked = false;
+	bool bIsPlayerUnlocking = false;
 
 	class APlayerCharacter* PlayerCharacter;
 	class APlayerController* PlayerContr;

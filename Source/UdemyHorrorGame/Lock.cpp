@@ -104,6 +104,7 @@ void ALock::Interact()
 
 void ALock::EnterLockView()
 {
+	bIsPlayerUnlocking = true;
 	PlayerContr->SetViewTargetWithBlend(Camera->GetOwner(), 0.6);
 	PlayerContr->SetIgnoreLookInput(true);
 	PlayerContr->bShowMouseCursor = true;
@@ -119,6 +120,8 @@ void ALock::EnterLockView()
 
 void ALock::ExitLockView()
 {
+	if (!bIsPlayerUnlocking) return;
+	bIsPlayerUnlocking = false;
 	PlayerContr->SetViewTargetWithBlend(PlayerCharacter, 0.6);
 	PlayerContr->bShowMouseCursor = false;
 	PlayerContr->ResetIgnoreLookInput();

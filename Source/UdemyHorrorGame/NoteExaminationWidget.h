@@ -27,6 +27,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 		class UImage* DragDetectionImage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UButton* ReadTextButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UTextBlock* ReadTextButtonText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UImage* ReadBackgroundImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UTextBlock* WidgetText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UButton* XButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		class UTextBlock* XButtonText;
+
 public:
 	void InitializeWidget(class UInventoryComponent* InventoryComponentRef);
 
@@ -44,9 +60,17 @@ private:
 	class UInventoryComponent* InventoryComponent;
 	class APlayerCharacter* PlayerCharacter;
 	class APlayerController* PlayerContr;
+	class ANote_Main* Note;
 
 	bool bRotateMesh = false;
 	FVector2D StartMouseLocation;
 
 	void CloseExaminationWidget();
+
+	UFUNCTION()
+	void OpenTextTranslate();
+	UFUNCTION()
+	void CloseTextTranslate();
+
+	FText ParseNoteText(FText ParseText);
 };
