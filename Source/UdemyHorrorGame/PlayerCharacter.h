@@ -152,6 +152,7 @@ public:
 	void AddPickupItem(class APickupActor_Main* PickUpItem);
 	void RemovePickupItem(class APickupActor_Main* PickUpItem);
 
+	UFUNCTION(BlueprintCallable)
 	void ToggleHUD();
 
 protected:
