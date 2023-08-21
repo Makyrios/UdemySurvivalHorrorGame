@@ -19,6 +19,9 @@
 #include "FlashlightComponent.h"
 #include "HealthComponent.h"
 #include "MainHUDWidget.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Sound/SoundCue.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -38,6 +41,7 @@ APlayerCharacter::APlayerCharacter()
 
 	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
+	FootstepTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Footstep Timeline Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 	FlashlightComponent = CreateDefaultSubobject<UFlashlightComponent>(TEXT("Flashlight Component"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
@@ -158,6 +162,10 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 	HeadBob();
+	TRange<float> R1 {MoveComponent->CrouchingSpeed, MoveComponent->SprintSpeed};
+	TRange<float> R2 {0.7, 1.3};
+	float MapValue = FMath::GetMappedRangeValueClamped(R1, R2, (float)GetCharacterMovement()->Velocity.Size());
+	FootstepTimelineComponent->SetPlayRate(MapValue);
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
@@ -327,6 +335,14 @@ void APlayerCharacter::SetCapsuleHalfHeight(float Amount)
 	GetCapsuleComponent()->SetCapsuleHalfHeight(Amount);
 }
 
+void APlayerCharacter::UpdateFootstep(float Amount)
+{
+	if (FootstepCurveFloat->FloatCurve.FindKey(Amount) != FKeyHandle::Invalid())
+	{
+		PlayFootstep();
+	}
+}
+
 void APlayerCharacter::HeadBob()
 {
 	if (!WalkHeadBob || !RunHeadBob)
@@ -349,6 +365,40 @@ void APlayerCharacter::HeadBob()
 			TRange<float> Range2 {0, 1};
 			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
 			PlayerController->ClientStartCameraShake(WalkHeadBob);
+		}
+	}
+}
+
+void APlayerCharacter::PlayFootstep()
+{
+	if (GetCharacterMovement()->Velocity.Size() > 10 && !GetCharacterMovement()->IsFalling())
+	{
+		FHitResult HitResult;
+		FVector Start = GetActorLocation();
+		FVector End = FVector(Start.X, Start.Y, Start.Z - 100);
+		FCollisionQueryParams Params;
+		Params.bReturnPhysicalMaterial = true;
+		bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, Params);
+		if (bWasHit)
+		{
+			if (UPhysicalMaterial* PhysMaterial = HitResult.PhysMaterial.Get())
+			{ 
+				TRange<float> R1 {GetMoveComponent()->CrouchingSpeed, GetMoveComponent()->SprintSpeed };
+				TRange<float> R2 { 0.5, 1.2 };
+				float SoundMultiplier = FMath::GetMappedRangeValueClamped(R1, R2, (float)GetCharacterMovement()->Velocity.Size());
+				if (PhysMaterial == TilePhysMaterial)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, TileFootstepsSoundCue, FVector(HitResult.Location.X, HitResult.Location.Y, HitResult.Location.Z), SoundMultiplier);
+				}
+				else if (PhysMaterial == GrassPhysMaterial)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, GrassFootstepsSoundCue, FVector(HitResult.Location.X, HitResult.Location.Y, HitResult.Location.Z), SoundMultiplier);
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Display, TEXT("Hitres: %s"), *HitResult.ToString());
+			}
 		}
 	}
 }
@@ -437,6 +487,21 @@ void APlayerCharacter::Initialize()
 		CrouchTimelineFloat.BindDynamic(this, &APlayerCharacter::SetCapsuleHalfHeight);
 		CrouchTimelineComponent->AddInterpFloat(CrouchCurveFloat, CrouchTimelineFloat);
 	}
+	//Footstep timeline
+	if (FootstepCurveFloat != nullptr)
+	{
+		if (TilePhysMaterial == nullptr || GrassPhysMaterial == nullptr || TileFootstepsSoundCue == nullptr || GrassFootstepsSoundCue == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Footsteps objects not set"));
+		}
+		FootstepTimelineFloat.BindDynamic(this, &APlayerCharacter::UpdateFootstep);
+		FootstepTimelineComponent->AddInterpFloat(FootstepCurveFloat, FootstepTimelineFloat);
+		FootstepTimelineComponent->SetLooping(true);
+		FootstepTimelineComponent->PlayFromStart();
+	}
+
+	/*FTimerHandle FootstepHandle;
+	GetWorld()->GetTimerManager().SetTimer(FootstepHandle, this, &APlayerCharacter::UpdateFootstep, 0.5, true);*/
 
 	//Flashlight component
 	FlashlightComponent->Initialize(this);

@@ -23,7 +23,7 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-		//* Components
+	// Camera
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		class USpringArmComponent* SpringArmComponent;
 	UPROPERTY(EditAnywhere, Category = "Camera")
@@ -35,6 +35,7 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		TSubclassOf<UCameraShakeBase> RunHeadBob;
 
+	// Components
 	UPROPERTY(EditAnywhere, Category = "Components")
 		class UMoveComponent* MoveComponent;
 	UPROPERTY(EditAnywhere, Category = "Components")
@@ -44,11 +45,24 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category = "Components")
 		class UHealthComponent* HealthComponent;
 
-
-	UPROPERTY(EditDefaultsOnly, Category = "Crouch")
-		UCurveFloat* CrouchCurveFloat;
-
 	UTimelineComponent* CrouchTimelineComponent;
+	UTimelineComponent* FootstepTimelineComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		UCurveFloat* CrouchCurveFloat;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		UCurveFloat* FootstepCurveFloat;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		TSubclassOf<UUserWidget> MainHUDClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		class UPhysicalMaterial* TilePhysMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		class UPhysicalMaterial* GrassPhysMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		class USoundCue* TileFootstepsSoundCue;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		class USoundCue* GrassFootstepsSoundCue;
+
 
 	//* Input 
 
@@ -106,9 +120,6 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* LMBAction;
 
-
-	UPROPERTY(EditAnywhere, Category = HUD)
-		TSubclassOf<UUserWidget> MainHUDClass;
 
 
 public:
@@ -170,6 +181,7 @@ private:
 	FVector2D LookAxis;
 	IGrabbable* GrabbedActor;
 	FOnTimelineFloat CrouchTimelineFloat;
+	FOnTimelineFloat FootstepTimelineFloat;
 	APlayerController* PlayerController;
 	TArray<class APickupActor_Main*> CurrentPickupItems;
 
@@ -197,7 +209,10 @@ private:
 
 	UFUNCTION()
 	void SetCapsuleHalfHeight(float Amount);
+	UFUNCTION()
+	void UpdateFootstep(float Amount);
 
 	void HeadBob();
+	void PlayFootstep();
 
 };
