@@ -29,7 +29,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void Interact() override;
+	bool Interact() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Timeline)

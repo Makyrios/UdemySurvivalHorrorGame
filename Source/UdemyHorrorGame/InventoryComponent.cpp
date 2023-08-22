@@ -164,7 +164,7 @@ void UInventoryComponent::ExamineItem(ANote_Main* NoteActor)
 		UE_LOG(LogTemp, Warning, TEXT("Pickup Actor is null"));
 		return;
 	}
-	if (NoteExaminationWidget->IsInViewport())
+	if (NoteExaminationWidget->IsVisible())
 	{
 		UE_LOG(LogTemp, Display, TEXT("Already examining item"));
 		return;

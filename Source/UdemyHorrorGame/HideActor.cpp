@@ -25,7 +25,7 @@ AHideActor::AHideActor()
 
 }
 
-void AHideActor::Interact()
+bool AHideActor::Interact()
 {
 	if (!PlayerCharacter->bIsHiding)
 	{
@@ -38,6 +38,7 @@ void AHideActor::Interact()
 		GetWorld()->GetTimerManager().SetTimer(MoveCharTimerHandle, this, &AHideActor::MoveCharacter, UGameplayStatics::GetWorldDeltaSeconds(this), true);
 		PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
+	return true;
 }
 
 // Called when the game starts or when spawned

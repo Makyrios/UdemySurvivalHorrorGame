@@ -60,16 +60,20 @@ void UNoteExaminationWidget::UpdateWidget(ANote_Main* NotePickupActor)
 
 void UNoteExaminationWidget::CloseExaminationWidget()
 {
-	UE_LOG(LogTemp, Display, TEXT("Close widget"));
-	//RemoveFromParent();
+	if (IsVisible())
+	{
+		UE_LOG(LogTemp, Display, TEXT("Close widget"));
+		//RemoveFromParent();
 
-	// Enable input
-	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	PlayerContr->ResetIgnoreLookInput();
-	PlayerContr->bShowMouseCursor = false;
-	PlayerContr->SetInputMode(FInputModeGameOnly());
+		// Enable input
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		PlayerContr->ResetIgnoreLookInput();
+		PlayerContr->bShowMouseCursor = false;
+		PlayerContr->SetInputMode(FInputModeGameOnly());
+		PlayerCharacter->bCanOpenInventory = true;
 
-	SetVisibility(ESlateVisibility::Collapsed);
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UNoteExaminationWidget::OpenTextTranslate()

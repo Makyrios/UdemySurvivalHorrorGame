@@ -5,14 +5,14 @@
 #include "Engine/Light.h"
 #include "Components/LightComponent.h"
 
-void AInteractionActor_LightSwitch::Interact()
+bool AInteractionActor_LightSwitch::Interact()
 {
 	Super::Interact();
 
 	if (LightRef == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Light ref is null for %s"), *GetActorNameOrLabel());
-		return;
+		return false;
 	}
 
 	if (LightRef->GetLightComponent()->IsVisible())
@@ -23,5 +23,5 @@ void AInteractionActor_LightSwitch::Interact()
 	{
 		LightRef->GetLightComponent()->SetVisibility(true);
 	}
-
+	return true;
 }

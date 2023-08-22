@@ -35,7 +35,7 @@ void AInteractionActor_OutwardsDoor::OpenDoor(float Value)
 	DoorStaticMesh->SetRelativeRotation(NewRotation);
 }
 
-void AInteractionActor_OutwardsDoor::Interact()
+bool AInteractionActor_OutwardsDoor::Interact()
 {
 	if (bIsOpened)
 	{
@@ -51,4 +51,5 @@ void AInteractionActor_OutwardsDoor::Interact()
 		TimelineComponent->Play();
 		bIsOpened = true;
 	}
+	return true;
 }

@@ -97,9 +97,10 @@ void ALock::CreateDials()
 	}
 }
 
-void ALock::Interact()
+bool ALock::Interact()
 {
 	EnterLockView();
+	return true;
 }
 
 void ALock::EnterLockView()

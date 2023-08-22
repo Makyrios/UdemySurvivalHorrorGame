@@ -29,7 +29,8 @@ void AInteractionActor::Tick(float DeltaTime)
 
 }
 
-void AInteractionActor::Interact()
+bool AInteractionActor::Interact()
 {
+	return true;
 }
 

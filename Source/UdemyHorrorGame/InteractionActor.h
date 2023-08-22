@@ -30,6 +30,6 @@ public:
 
 
 	// Inherited via IInteractable
-	virtual void Interact() override;
+	virtual bool Interact() override;
 
 };

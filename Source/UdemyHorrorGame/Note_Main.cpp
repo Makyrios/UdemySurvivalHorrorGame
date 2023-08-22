@@ -20,14 +20,6 @@ ANote_Main::ANote_Main()
 	BackTextRenderComponent->SetupAttachment(StaticMesh);
 }
 
-void ANote_Main::Pickup()
-{
-	if (PlayerCharacter != nullptr)
-	{
-		PlayerCharacter->GetInventoryComponent()->ExamineItem(this);
-	}
-}
-
 // Called when the game starts or when spawned
 void ANote_Main::BeginPlay()
 {
@@ -41,6 +33,16 @@ void ANote_Main::OnConstruction(const FTransform& Transform)
 
 	FrontTextRenderComponent->SetText(FrontNoteText);
 	BackTextRenderComponent->SetText(BackNoteText);
+}
+
+bool ANote_Main::ExecutePickup()
+{
+	if (PlayerCharacter != nullptr)
+	{
+		PlayerCharacter->GetInventoryComponent()->ExamineItem(this);
+		return true;
+	}
+	return false;
 }
 
 // Called every frame

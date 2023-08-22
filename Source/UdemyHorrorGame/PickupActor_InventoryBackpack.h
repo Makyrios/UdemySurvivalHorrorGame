@@ -14,8 +14,8 @@ class UDEMYHORRORGAME_API APickupActor_InventoryBackpack : public APickupActor_M
 {
 	GENERATED_BODY()
 
-public:
-	virtual void Pickup() override;
+protected:
+	bool ExecutePickup() override;
 
 
 private:

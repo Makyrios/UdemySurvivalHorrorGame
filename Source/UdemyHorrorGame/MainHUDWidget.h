@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UProgressBarsWidget* ProgressBarsWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UObjectivesWidget* ObjectivesWidget;
+
 public:
 	void InitializeWidget(class APlayerCharacter* PlayerCharacterRef);
 

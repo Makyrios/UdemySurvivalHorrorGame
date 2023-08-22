@@ -29,7 +29,7 @@ protected:
 public:
 	AHideActor_Locker();
 
-	void Interact() override;
+	bool Interact() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Components)

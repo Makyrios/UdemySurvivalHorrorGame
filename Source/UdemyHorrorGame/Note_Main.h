@@ -32,13 +32,14 @@ public:
 	// Sets default values for this actor's properties
 	ANote_Main();
 
-	void Pickup() override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void OnConstruction(const FTransform& Transform) override;
+
+	bool ExecutePickup() override;
 
 public:	
 	// Called every frame

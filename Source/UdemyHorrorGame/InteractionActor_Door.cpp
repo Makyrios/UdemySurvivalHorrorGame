@@ -31,7 +31,7 @@ void AInteractionActor_Door::BeginPlay()
 	}
 }
 
-void AInteractionActor_Door::Interact()
+bool AInteractionActor_Door::Interact()
 {
 	Super::Interact();
 
@@ -45,6 +45,7 @@ void AInteractionActor_Door::Interact()
 		TimelineComponent->Play();
 		bIsOpened = true;
 	}
+	return true;
 }
 
 void AInteractionActor_Door::OpenDoor(float Value)

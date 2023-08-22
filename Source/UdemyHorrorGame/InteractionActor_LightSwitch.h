@@ -15,7 +15,7 @@ class UDEMYHORRORGAME_API AInteractionActor_LightSwitch : public AInteractionAct
 	GENERATED_BODY()
 	
 public:
-	void Interact() override;
+	bool Interact() override;
 
 private:
 	UPROPERTY(EditInstanceOnly, Category = Light)

@@ -35,10 +35,13 @@ void UExaminationWidget::UpdateWidget(int Index)
 
 void UExaminationWidget::CloseExaminationWidget()
 {
-	UE_LOG(LogTemp, Display, TEXT("Close widget"));
-	//RemoveFromParent();
-	SetVisibility(ESlateVisibility::Collapsed);
-	PlayerCharacter->ToggleInventory();
+	if (IsVisible())
+	{
+		UE_LOG(LogTemp, Display, TEXT("Close widget"));
+		//RemoveFromParent();
+		SetVisibility(ESlateVisibility::Collapsed);
+		PlayerCharacter->ToggleInventory();
+	}
 }
 
 void UExaminationWidget::NativeConstruct()

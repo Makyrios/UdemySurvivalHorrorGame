@@ -31,14 +31,15 @@ void AHideActor_Locker::BeginPlay()
 }
 
 
-void AHideActor_Locker::Interact()
+bool AHideActor_Locker::Interact()
 {
-	if (!bCanInteract) return;
+	if (!bCanInteract) return false;
 	PlayerCharacter->bCanOpenInventory = false;
 	bCanInteract = false;
 	DoorTimeline->Play();
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() { Super::Interact(); }, DoorTimeline->GetPlayRate() - 0.5f, false);
+	return true;
 }
 
 void AHideActor_Locker::OpenDoor(float Value)

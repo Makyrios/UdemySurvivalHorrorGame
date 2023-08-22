@@ -5,9 +5,10 @@
 #include "PlayerCharacter.h"
 #include "InventoryComponent.h"
 
-void APickupActor_InventoryBackpack::Pickup()
+bool APickupActor_InventoryBackpack::ExecutePickup()
 {
 	AddMoreSlots(BackpackSlots);
+	return true;
 }
 
 void APickupActor_InventoryBackpack::AddMoreSlots(int SlotsAmount)

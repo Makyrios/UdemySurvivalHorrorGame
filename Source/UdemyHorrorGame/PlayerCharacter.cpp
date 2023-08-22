@@ -21,6 +21,8 @@
 #include "MainHUDWidget.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Sound/SoundCue.h"
+#include "HG_GameStateBase.h"
+#include "Components/Image.h"
 
 
 // Sets default values
@@ -253,6 +255,7 @@ void APlayerCharacter::ToggleInventory()
 		PlayerController->SetIgnoreLookInput(true);
 		PlayerController->bShowMouseCursor = true;
 		InventoryMenu->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
 		FInputModeGameAndUI InputMode;
 		InputMode.SetWidgetToFocus(InventoryMenu->GetCachedWidget());
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -270,6 +273,7 @@ void APlayerCharacter::ToggleInventory()
 		PlayerController->ResetIgnoreLookInput();
 		PlayerController->bShowMouseCursor = false;
 		InventoryMenu->SetVisibility(ESlateVisibility::Collapsed);
+		MainHUDWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		InventoryMenu->HideItemDetails();
 		InventoryMenu->CloseDropdownMenu();
 		PlayerController->SetInputMode(FInputModeGameOnly());
@@ -500,9 +504,9 @@ void APlayerCharacter::Initialize()
 		FootstepTimelineComponent->PlayFromStart();
 	}
 
-	/*FTimerHandle FootstepHandle;
-	GetWorld()->GetTimerManager().SetTimer(FootstepHandle, this, &APlayerCharacter::UpdateFootstep, 0.5, true);*/
-
 	//Flashlight component
 	FlashlightComponent->Initialize(this);
+
+	//Game state
+	Cast<AHG_GameStateBase>(UGameplayStatics::GetGameState(this))->Initialize(MainHUDWidget);
 }

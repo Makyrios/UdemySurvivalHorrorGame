@@ -33,7 +33,7 @@ public:
 	// Sets default values for this actor's properties
 	AHideActor();
 
-	void Interact() override;
+	bool Interact() override;
 
 protected:
 	bool bCanInteract = true;

@@ -3,6 +3,8 @@
 
 #include "InventoryItem_FlashlightBattery.h"
 #include "FlashlightComponent.h"
+#include "HG_GameStateBase.h"
+#include <Kismet/GameplayStatics.h>
 
 bool AInventoryItem_FlashlightBattery::UseItem()
 {
@@ -11,6 +13,7 @@ bool AInventoryItem_FlashlightBattery::UseItem()
 	if (FlashlightComp->GetCurrentBatteryLevel() < FlashlightComp->MaxBatteryLevel)
 	{
 		FlashlightComp->AddBatteryLife(BatteryRegenAmount); 
+		Cast<AHG_GameStateBase>(UGameplayStatics::GetGameState(this))->CompleteObjectiveCall(FName("UseBattery"), true);
 		return true;
 	}
 	return false;

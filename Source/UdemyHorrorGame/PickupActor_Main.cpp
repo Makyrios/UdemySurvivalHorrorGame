@@ -100,18 +100,28 @@ void APickupActor_Main::Tick(float DeltaTime)
 	}
 }
 
-void APickupActor_Main::Pickup()
+
+bool APickupActor_Main::ExecutePickup()
 {
 	if (PlayerCharacter != nullptr)
 	{
 		int Remainder = 0;
-		PlayerCharacter->GetInventoryComponent()->AddItem(Item, Amount, &Remainder);
-		if (Remainder == 0)
+		if (PlayerCharacter->GetInventoryComponent()->AddItem(Item, Amount, &Remainder))
 		{
-			Destroy();
-			PlayerCharacter->RemovePickupItem(this);
+			if (Remainder == 0)
+			{
+				Destroy();
+				PlayerCharacter->RemovePickupItem(this);
+			}
+			return true;
 		}
 	}
+	return false;
+}
+
+bool APickupActor_Main::Pickup_Implementation()
+{
+	return ExecutePickup();
 }
 
 void APickupActor_Main::TogglePrompt(bool bCanPickup)

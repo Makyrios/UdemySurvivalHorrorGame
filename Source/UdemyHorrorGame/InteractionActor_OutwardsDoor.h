@@ -25,7 +25,7 @@ protected:
 	void OpenDoor(float Value) override;
 
 public:
-	void Interact() override;
+	bool Interact() override;
 
 private:
 	float DotProduct;

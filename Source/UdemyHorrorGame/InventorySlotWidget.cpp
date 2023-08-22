@@ -75,7 +75,6 @@ FReply UInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& Geometry, co
 		InventoryMenu->OpenDropdownMenu(this);
 	}
 
-
 	return FReply::Handled();
 }
 

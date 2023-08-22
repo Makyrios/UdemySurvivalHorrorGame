@@ -58,12 +58,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Pickup();
+	UFUNCTION(BlueprintNativeEvent)
+	bool Pickup();
 
 protected:
 	class APlayerCharacter* PlayerCharacter;
 	class APlayerController* PlayerContr;
 	class UPickupPromptWidget* PickupPromptWidget;
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool ExecutePickup();
 
 private:
 	bool bIsPlayerOverlap = false;

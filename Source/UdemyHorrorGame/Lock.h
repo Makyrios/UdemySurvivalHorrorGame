@@ -48,7 +48,7 @@ public:
 
 	void OnConstruction(const FTransform& Transform) override;
 
-	void Interact() override;
+	bool Interact() override;
 
 protected:
 	// Called when the game starts or when spawned
