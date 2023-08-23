@@ -44,6 +44,7 @@ APlayerCharacter::APlayerCharacter()
 	MoveComponent = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 	CrouchTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Crouch Timeline Component"));
 	FootstepTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Footstep Timeline Component"));
+	LeaningTimelineComponent = CreateDefaultSubobject<UTimelineComponent>(TEXT("Leaning Timeline Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 	FlashlightComponent = CreateDefaultSubobject<UFlashlightComponent>(TEXT("Flashlight Component"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
@@ -137,6 +138,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// LMB Action
 		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Started, this, &APlayerCharacter::LMBPress);
 		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Completed, this, &APlayerCharacter::LMBRelease);
+
+		// Leaning Action
+		EnhancedInputComponent->BindAction(LeanLeftAction, ETriggerEvent::Started, this, &APlayerCharacter::StartLeanLeft);
+		EnhancedInputComponent->BindAction(LeanLeftAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopLeanLeft);
+		EnhancedInputComponent->BindAction(LeanRightAction, ETriggerEvent::Started, this, &APlayerCharacter::StartLeanRight);
+		EnhancedInputComponent->BindAction(LeanRightAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopLeanRight);
 
 	}
 }
@@ -321,6 +328,42 @@ void APlayerCharacter::LMBRelease()
 	LMBReleasedEvent.Broadcast();
 }
 
+void APlayerCharacter::StartLeanLeft()
+{
+	if (!bIsLeaningRight && !bIsLeaningLeft)
+	{
+		bIsLeaningLeft = true;
+		LeaningTimelineComponent->Play();
+	}
+}
+
+void APlayerCharacter::StopLeanLeft()
+{
+	if (bIsLeaningLeft)
+	{
+		bIsReversingLeaning = true;
+		LeaningTimelineComponent->Reverse();
+	}
+}
+
+void APlayerCharacter::StartLeanRight()
+{
+	if (!bIsLeaningLeft && !bIsLeaningRight)
+	{
+		bIsLeaningRight = true;
+		LeaningTimelineComponent->Play();
+	}
+}
+
+void APlayerCharacter::StopLeanRight()
+{
+	if (bIsLeaningRight)
+	{
+		bIsReversingLeaning = true;
+		LeaningTimelineComponent->Reverse();
+	}
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -404,6 +447,50 @@ void APlayerCharacter::PlayFootstep()
 				UE_LOG(LogTemp, Display, TEXT("Hitres: %s"), *HitResult.ToString());
 			}
 		}
+	}
+}
+
+void APlayerCharacter::LeanCamera(float Amount)
+{
+	UE_LOG(LogTemp, Display, TEXT("%f"), Amount);
+	if (bIsLeaningLeft)
+	{
+		TRange<float> CurveRange {0, 1};
+		TRange<float> RollRange {0, -15};
+		float RollValue = FMath::GetMappedRangeValueClamped(CurveRange, RollRange, Amount);
+		FRotator CameraRot = Controller->GetControlRotation();
+		CameraRot.Roll = RollValue;
+		Controller->SetControlRotation(CameraRot);
+		TRange<float> OffsetRange {0, -25};
+		float YawValue = FMath::GetMappedRangeValueClamped(CurveRange, OffsetRange, Amount);
+		FVector CameraLoc = CameraComponent->GetRelativeLocation();
+		CameraLoc.Y = YawValue;
+		CameraComponent->SetRelativeLocation(CameraLoc);
+	}
+	else if (bIsLeaningRight)
+	{
+		TRange<float> CurveRange {0, 1};
+		TRange<float> RollRange {0, 15};
+		float RollValue = FMath::GetMappedRangeValueClamped(CurveRange, RollRange, Amount);
+		FRotator CameraRot = Controller->GetControlRotation();
+		CameraRot.Roll = RollValue;
+		Controller->SetControlRotation(CameraRot);
+		//CameraComponent->SetRelativeRotation(CameraRot);
+		TRange<float> OffsetRange {0, 25};
+		float YawValue = FMath::GetMappedRangeValueClamped(CurveRange, OffsetRange, Amount);
+		FVector CameraLoc = CameraComponent->GetRelativeLocation();
+		CameraLoc.Y = YawValue;
+		CameraComponent->SetRelativeLocation(CameraLoc);
+	}
+}
+
+void APlayerCharacter::FinishLeanCamera()
+{
+	if (bIsReversingLeaning)
+	{
+		bIsLeaningLeft = false;
+		bIsLeaningRight = false;
+		bIsReversingLeaning = false;
 	}
 }
 
@@ -502,6 +589,15 @@ void APlayerCharacter::Initialize()
 		FootstepTimelineComponent->AddInterpFloat(FootstepCurveFloat, FootstepTimelineFloat);
 		FootstepTimelineComponent->SetLooping(true);
 		FootstepTimelineComponent->PlayFromStart();
+	}
+	// Leaning timeline
+	if (LeaningCurveFloat != nullptr)
+	{
+		LeaningTimelineFloat.BindDynamic(this, &APlayerCharacter::LeanCamera);
+		LeaningTimelineComponent->AddInterpFloat(LeaningCurveFloat, LeaningTimelineFloat);
+		FOnTimelineEventStatic FinishFunc;
+		FinishFunc.BindUObject(this, &APlayerCharacter::FinishLeanCamera);
+		LeaningTimelineComponent->SetTimelineFinishedFunc(FinishFunc);
 	}
 
 	//Flashlight component

@@ -47,11 +47,14 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 
 	UTimelineComponent* CrouchTimelineComponent;
 	UTimelineComponent* FootstepTimelineComponent;
+	UTimelineComponent* LeaningTimelineComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization|Curves")
 		UCurveFloat* CrouchCurveFloat;
-	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization|Curves")
 		UCurveFloat* FootstepCurveFloat;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization|Curves")
+		UCurveFloat* LeaningCurveFloat;
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 		TSubclassOf<UUserWidget> MainHUDClass;
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
@@ -120,6 +123,12 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* LMBAction;
 
+	/** Leaning Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* LeanLeftAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* LeanRightAction;
+
 
 
 public:
@@ -136,6 +145,9 @@ public:
 	bool bIsInventoryOpen = false;
 	bool bIsHiding = false;
 	bool bCanOpenInventory = true;
+	bool bIsLeaningLeft = false;
+	bool bIsLeaningRight = false;
+	bool bIsReversingLeaning = false;
 
 	class UExaminationWidget* ExaminationWidget;
 	class UNoteExaminationWidget* NoteExaminationWidget;
@@ -183,6 +195,7 @@ private:
 	IGrabbable* GrabbedActor;
 	FOnTimelineFloat CrouchTimelineFloat;
 	FOnTimelineFloat FootstepTimelineFloat;
+	FOnTimelineFloat LeaningTimelineFloat;
 	APlayerController* PlayerController;
 	TArray<class APickupActor_Main*> CurrentPickupItems;
 
@@ -205,15 +218,25 @@ private:
 	void Return();
 	void LMBPress();
 	void LMBRelease();
+	void StartLeanLeft();
+	void StopLeanLeft();
+	void StartLeanRight();
+	void StopLeanRight();
 
 	AActor* LineTrace(float Length);
 
+	void HeadBob();
+
+	// Timeline functions
 	UFUNCTION()
 	void SetCapsuleHalfHeight(float Amount);
 	UFUNCTION()
 	void UpdateFootstep(float Amount);
+	UFUNCTION()
+	void LeanCamera(float Amount);
+	UFUNCTION()
+	void FinishLeanCamera();
 
-	void HeadBob();
 	void PlayFootstep();
 
 };
