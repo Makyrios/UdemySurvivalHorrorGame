@@ -30,6 +30,7 @@ APickupActor_Main::APickupActor_Main()
 	PromptWidgetComponent->SetWidgetClass(LoadClass<UUserWidget>(NULL, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/PickupActors/WBP_PickupPromptWidget.WBP_PickupPromptWidget_C'")));
 
 	EPromptImage = LoadObject<UTexture2D>(NULL, TEXT("/Script/Engine.Texture2D'/Game/Textures/PickupItems/E_Prompt.E_Prompt'"));
+	LMBPromptImage = LoadObject<UTexture2D>(NULL, TEXT("/Script/Engine.Texture2D'/Game/Textures/PickupItems/LMB_Prompt.LMB_Prompt'"));
 	ArrowPromptImage = LoadObject<UTexture2D>(NULL, TEXT("/Script/Engine.Texture2D'/Game/Textures/PickupItems/Arrow_Prompt.Arrow_Prompt'"));
 }
 
@@ -128,7 +129,7 @@ void APickupActor_Main::TogglePrompt(bool bCanPickup)
 {
 	if (bCanPickup)
 	{
-		PickupPromptWidget->PromptImage->SetBrushFromTexture(EPromptImage);
+		PickupPromptWidget->PromptImage->SetBrushFromTexture(LMBPromptImage);
 	}
 	else
 	{

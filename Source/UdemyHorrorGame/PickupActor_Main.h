@@ -78,5 +78,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 		UTexture2D* ArrowPromptImage;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+		UTexture2D* LMBPromptImage;
+
 	void TogglePrompt(bool bCanPickup);
 };
