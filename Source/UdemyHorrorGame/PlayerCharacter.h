@@ -138,6 +138,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Interact")
 		float TraceLength = 400;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Postprocessing")
+		float DOFLength = 300;
+
 	FPressedReturn PressedReturnEvent;
 	FLMBPressed LMBPressedEvent;
 	FLMBReleased LMBReleasedEvent;
@@ -226,6 +229,7 @@ private:
 	AActor* LineTrace(float Length);
 
 	void HeadBob();
+	void UpdateDOF();
 
 	// Timeline functions
 	UFUNCTION()

@@ -91,6 +91,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateDOF();
 }
 
 // Called to bind functionality to input
@@ -413,6 +414,28 @@ void APlayerCharacter::HeadBob()
 			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
 			PlayerController->ClientStartCameraShake(WalkHeadBob);
 		}
+	}
+}
+
+void APlayerCharacter::UpdateDOF()
+{
+	FHitResult HitResult;
+	FVector Start = GetCameraComponent()->GetComponentLocation();
+	FVector End = Start + GetCameraComponent()->GetForwardVector() * DOFLength;
+	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+	if (bWasHit)
+	{
+		FVector Location = { HitResult.Location.X, HitResult.Location.Y, HitResult.Location.Z };
+		float FocalDistance = (Location - Start).Size();
+		GetCameraComponent()->PostProcessSettings.DepthOfFieldFocalDistance = FocalDistance;
+		UE_LOG(LogTemp, Display, TEXT("Focal Distance: %f"), FocalDistance);
+		GetCameraComponent()->PostProcessSettings.DepthOfFieldDepthBlurRadius = 350 / (FocalDistance);
+		UE_LOG(LogTemp, Display, TEXT("%f"), GetCameraComponent()->PostProcessSettings.DepthOfFieldDepthBlurRadius);
+	}
+	else
+	{
+		GetCameraComponent()->PostProcessSettings.DepthOfFieldFocalDistance = 0;
+		GetCameraComponent()->PostProcessSettings.DepthOfFieldDepthBlurRadius = 0;
 	}
 }
 
