@@ -13,10 +13,12 @@ DECLARE_MULTICAST_DELEGATE(FPressedReturn)
 DECLARE_MULTICAST_DELEGATE(FLMBPressed)
 DECLARE_MULTICAST_DELEGATE(FLMBReleased)
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleOutlastCamera, bool, bCameraBool);
 
 class UCameraComponent;
 class IGrabbable;
 class UTimelineComponent;
+class UMainHUDWidget;
 
 UCLASS()
 class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
@@ -56,7 +58,9 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization|Curves")
 		UCurveFloat* LeaningCurveFloat;
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
-		TSubclassOf<UUserWidget> MainHUDClass;
+		TSubclassOf<UMainHUDWidget> MainHUDClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+		TSubclassOf<UUserWidget> CameraClass;
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 		class UPhysicalMaterial* TilePhysMaterial;
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
@@ -129,7 +133,15 @@ class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* LeanRightAction;
 
+	/** Toggle Camera Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ToggleCameraAction;
 
+	/** Camera Zoom Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ZoomInAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* ZoomOutAction;
 
 public:
 	// Sets default values for this character's properties
@@ -141,9 +153,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Postprocessing")
 		float DOFLength = 300;
 
+	UPROPERTY(EditDefaultsOnly, Category = "VideoCamera")
+		float MinFOV = 30;
+	UPROPERTY(EditDefaultsOnly, Category = "VideoCamera")
+		float MaxFOV = 90;
+
 	FPressedReturn PressedReturnEvent;
 	FLMBPressed LMBPressedEvent;
 	FLMBReleased LMBReleasedEvent;
+
+	UPROPERTY(BlueprintAssignable)
+	FToggleOutlastCamera ToggleOutlastCameraEvent;
 
 	bool bIsInventoryOpen = false;
 	bool bIsHiding = false;
@@ -203,6 +223,7 @@ private:
 	TArray<class APickupActor_Main*> CurrentPickupItems;
 
 	class UMainHUDWidget* MainHUDWidget;
+	class UUserWidget* CameraWidget;
 
 	void Initialize();
 
@@ -210,26 +231,39 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Interact();
+	// Grabbing items
 	void StartGrab();
 	void StopGrab();
+	// Flashlight
 	void ToggleFlashlight();
+	// Sprinting
 	void StartSprint();
 	void StopSprint();
+	// Crouching
 	void StartCrouch();
 	void StopCrouch();
+	// Interact with Pickup actors
 	void PickupItem();
+	// Return button event
 	void Return();
+	// Left mouse button events
 	void LMBPress();
 	void LMBRelease();
+	// Leaning
 	void StartLeanLeft();
 	void StopLeanLeft();
 	void StartLeanRight();
 	void StopLeanRight();
+	// Camera functionality
+	void ToggleCamera();
+	void ZoomCameraIn();
+	void ZoomCameraOut();
 
 	AActor* LineTrace(float Length);
 
 	void HeadBob();
 	void UpdateDOF();
+	void PlayFootstep();
 
 	// Timeline functions
 	UFUNCTION()
@@ -240,7 +274,5 @@ private:
 	void LeanCamera(float Amount);
 	UFUNCTION()
 	void FinishLeanCamera();
-
-	void PlayFootstep();
 
 };

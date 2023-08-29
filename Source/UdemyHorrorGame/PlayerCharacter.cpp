@@ -34,6 +34,7 @@ APlayerCharacter::APlayerCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	CameraComponent->SetupAttachment(RootComponent);
 	CameraComponent->bUsePawnControlRotation = true;
+	CameraComponent->SetFieldOfView(MaxFOV);
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
 	SpringArmComponent->SetupAttachment(CameraComponent);
@@ -48,6 +49,7 @@ APlayerCharacter::APlayerCharacter()
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 	FlashlightComponent = CreateDefaultSubobject<UFlashlightComponent>(TEXT("Flashlight Component"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
 }
 
 void APlayerCharacter::AddPickupItem(APickupActor_Main* PickUpItem)
@@ -136,15 +138,22 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//Pickup Item Context
 		EnhancedInputComponent->BindAction(PickupItemAction, ETriggerEvent::Completed, this, &APlayerCharacter::PickupItem);
 
-		// LMB Action
+		//LMB Action
 		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Started, this, &APlayerCharacter::LMBPress);
 		EnhancedInputComponent->BindAction(LMBAction, ETriggerEvent::Completed, this, &APlayerCharacter::LMBRelease);
 
-		// Leaning Action
+		//Leaning Action
 		EnhancedInputComponent->BindAction(LeanLeftAction, ETriggerEvent::Started, this, &APlayerCharacter::StartLeanLeft);
 		EnhancedInputComponent->BindAction(LeanLeftAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopLeanLeft);
 		EnhancedInputComponent->BindAction(LeanRightAction, ETriggerEvent::Started, this, &APlayerCharacter::StartLeanRight);
 		EnhancedInputComponent->BindAction(LeanRightAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopLeanRight);
+
+		//Toggle Camera Action
+		EnhancedInputComponent->BindAction(ToggleCameraAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleCamera);
+
+		//Zoom Action
+		EnhancedInputComponent->BindAction(ZoomInAction, ETriggerEvent::Started, this, &APlayerCharacter::ZoomCameraIn);
+		EnhancedInputComponent->BindAction(ZoomOutAction, ETriggerEvent::Started, this, &APlayerCharacter::ZoomCameraOut);
 
 	}
 }
@@ -365,6 +374,24 @@ void APlayerCharacter::StopLeanRight()
 	}
 }
 
+void APlayerCharacter::ToggleCamera()
+{
+	ToggleHUD();
+	if (!CameraWidget->IsVisible())
+	{
+		CameraWidget->AddToViewport();
+		ToggleOutlastCameraEvent.Broadcast(true);
+		//CameraWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+	else
+	{
+		//CameraWidget->SetVisibility(ESlateVisibility::Collapsed);
+		CameraWidget->RemoveFromViewport();
+		ToggleOutlastCameraEvent.Broadcast(false);
+		CameraComponent->SetFieldOfView(MaxFOV);
+	}
+}
+
 AActor* APlayerCharacter::LineTrace(float Length)
 {
 	FHitResult HitResult;
@@ -517,6 +544,24 @@ void APlayerCharacter::FinishLeanCamera()
 	}
 }
 
+void APlayerCharacter::ZoomCameraIn()
+{
+	if (CameraWidget->IsInViewport())
+	{
+		float NewFOV = FMath::Clamp(CameraComponent->FieldOfView - 5, MinFOV, MaxFOV);
+		CameraComponent->SetFieldOfView(NewFOV);
+	}
+}
+
+void APlayerCharacter::ZoomCameraOut()
+{
+	if (CameraWidget->IsInViewport())
+	{
+		float NewFOV = FMath::Clamp(CameraComponent->FieldOfView + 5, MinFOV, MaxFOV);
+		CameraComponent->SetFieldOfView(NewFOV);
+	}
+}
+
 void APlayerCharacter::CheckPickupContext()
 {
 	if (CurrentPickupItems.Num() > 0)
@@ -577,6 +622,11 @@ void APlayerCharacter::Initialize()
 		MainHUDWidget = CreateWidget<UMainHUDWidget>(Cast<AHG_PlayerController>(GetController()), MainHUDClass);
 		MainHUDWidget->InitializeWidget(this);
 		MainHUDWidget->AddToViewport();
+	}
+	//HUD
+	if (CameraClass)
+	{
+		CameraWidget = CreateWidget(Cast<AHG_PlayerController>(GetController()), CameraClass);
 	}
 
 	//Mapping context
