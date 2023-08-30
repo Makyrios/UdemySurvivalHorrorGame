@@ -386,7 +386,7 @@ void APlayerCharacter::ToggleCamera()
 	else
 	{
 		//CameraWidget->SetVisibility(ESlateVisibility::Collapsed);
-		CameraWidget->RemoveFromViewport();
+		CameraWidget->RemoveFromParent();
 		ToggleOutlastCameraEvent.Broadcast(false);
 		CameraComponent->SetFieldOfView(MaxFOV);
 	}
