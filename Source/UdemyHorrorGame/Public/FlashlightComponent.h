@@ -55,7 +55,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	inline float GetCurrentBatteryLevel() const { return CurrentBatteryLevel; }
+	float GetCurrentBatteryLevel() const;
 
 public:
 

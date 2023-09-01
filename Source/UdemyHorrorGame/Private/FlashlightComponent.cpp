@@ -4,6 +4,7 @@
 #include "FlashlightComponent.h"
 #include "Components/SpotLightComponent.h"
 #include "PlayerCharacter.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UFlashlightComponent::UFlashlightComponent()
@@ -100,5 +101,12 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+}
+
+float UFlashlightComponent::GetCurrentBatteryLevel() const
+{
+	ACharacter* Act = UGameplayStatics::GetPlayerCharacter(this, 0);
+	Act->SetActorEnableCollision(true);
+	return CurrentBatteryLevel;
 }
 
