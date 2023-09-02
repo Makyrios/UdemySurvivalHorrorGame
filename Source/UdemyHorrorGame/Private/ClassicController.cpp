@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include <Perception/AISense_Sight.h>
+#include <Perception/AISense_Hearing.h>
 
 AClassicController::AClassicController()
 {
@@ -61,6 +62,20 @@ void AClassicController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus
 			BlackboardComp->SetValueAsVector(FName("investigateLocation"), Stimulus.StimulusLocation);
 			DrawDebugSphere(GetWorld(), Stimulus.StimulusLocation, 50, 20, FColor::Red, true);
 			BlackboardComp->ClearValue(FName("playerActor"));
+		}
+	}
+	else if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			BlackboardComp->SetValueAsVector(FName("noiseLocation"), Stimulus.StimulusLocation);
+			// Find look rotation at sound
+			/*FRotator RotationTarget = FRotationMatrix::MakeFromX(Stimulus.StimulusLocation - GetPawn()->GetActorLocation()).Rotator();
+			while (!GetPawn()->GetActorRotation().Equals(RotationTarget))
+			{
+				FRotator Rotation = FMath::RInterpTo(GetPawn()->GetActorRotation(), RotationTarget, GetWorld()->GetDeltaSeconds(), 30);
+				GetPawn()->SetActorRotation(Rotation);
+			}*/
 		}
 	}
 }

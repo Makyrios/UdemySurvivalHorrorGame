@@ -235,6 +235,7 @@ private:
 
 	//* Input *//
 	void Move(const FInputActionValue& Value);
+	void PlayFootstepSound();
 	void Look(const FInputActionValue& Value);
 	void Interact();
 	// Grabbing items
@@ -270,6 +271,7 @@ private:
 	void HeadBob();
 	void UpdateDOF();
 	void PlayFootstep();
+	void MakeNoises();
 
 	// Timeline functions
 	UFUNCTION()
