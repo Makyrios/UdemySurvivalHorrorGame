@@ -23,6 +23,7 @@
 #include "Sound/SoundCue.h"
 #include "HG_GameStateBase.h"
 #include "Components/Image.h"
+#include <Perception/AISense_Hearing.h>
 
 
 // Sets default values
@@ -180,7 +181,14 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
+	// Camera shake
 	HeadBob();
+	PlayFootstepSound();
+	MakeNoises();
+}
+
+void APlayerCharacter::PlayFootstepSound()
+{
 	TRange<float> R1 {MoveComponent->CrouchingSpeed, MoveComponent->SprintSpeed};
 	TRange<float> R2 {0.7, 1.3};
 	float MapValue = FMath::GetMappedRangeValueClamped(R1, R2, (float)GetCharacterMovement()->Velocity.Size());
@@ -380,14 +388,19 @@ void APlayerCharacter::ToggleCamera()
 	if (!CameraWidget->IsVisible())
 	{
 		CameraWidget->AddToViewport();
-		ToggleOutlastCameraEvent.Broadcast(true);
-		//CameraWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		if (ToggleOutlastCameraEvent.IsBound())
+		{
+			ToggleOutlastCameraEvent.Broadcast(true);
+		}
 	}
 	else
 	{
 		//CameraWidget->SetVisibility(ESlateVisibility::Collapsed);
 		CameraWidget->RemoveFromParent();
-		ToggleOutlastCameraEvent.Broadcast(false);
+		if (ToggleOutlastCameraEvent.IsBound())
+		{
+			ToggleOutlastCameraEvent.Broadcast(false);
+		}
 		CameraComponent->SetFieldOfView(MaxFOV);
 	}
 }
@@ -434,21 +447,47 @@ void APlayerCharacter::HeadBob()
 		UE_LOG(LogTemp, Warning, TEXT("Head bobs are null"));
 		return;
 	}
+	// Is moving at all
 	if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetWalkSpeed() && !GetCharacterMovement()->IsFalling())
 	{
-		if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetSprintSpeed() && !GetCharacterMovement()->IsFalling())
+		// Is sprinting
+		if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetSprintSpeed())
 		{
 			TRange<float> Range1 { 0.f, MoveComponent->GetSprintSpeed() };
 			TRange<float> Range2 {0, 1};
 			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
 			PlayerController->ClientStartCameraShake(RunHeadBob, BobScale);
 		}
+		// Is walking
 		else
 		{
 			TRange<float> Range1 { 0.f, MoveComponent->GetWalkSpeed() };
 			TRange<float> Range2 {0, 1};
 			float BobScale = FMath::GetMappedRangeValueClamped(Range1, Range2, (float)GetCharacterMovement()->Velocity.Size());
 			PlayerController->ClientStartCameraShake(WalkHeadBob);
+		}
+	}
+}
+
+void APlayerCharacter::MakeNoises()
+{
+	// Is moving at all
+	if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetWalkSpeed() && !GetCharacterMovement()->IsFalling())
+	{
+		// Is sprinting
+		if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetSprintSpeed())
+		{
+			UAISense_Hearing::ReportNoiseEvent(this, GetActorLocation(), 1, this);
+		}
+		// Is walking
+		else if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetWalkSpeed())
+		{
+			UAISense_Hearing::ReportNoiseEvent(this, GetActorLocation(), 0.5, this);
+		}
+		// Is crouching
+		else if (GetCharacterMovement()->Velocity.Size() >= MoveComponent->GetCrouchingSpeed())
+		{
+			UAISense_Hearing::ReportNoiseEvent(this, GetActorLocation(), 0.2, this);
 		}
 	}
 }
