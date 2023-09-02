@@ -11,8 +11,6 @@ class UDEMYHORRORGAME_API AClassic : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditInstanceOnly, Category = Patrol)
-	TArray<class AAITargetPoint*> RoomTargetPoints;
 
 public:
 	UPROPERTY(EditAnywhere, Category = AI)
@@ -30,5 +28,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	inline TArray<class AAITargetPoint*> GetRoomTargetPoints() const { return RoomTargetPoints; }
+
+private:
+	UPROPERTY(EditInstanceOnly, Category = Patrol)
+	TArray<class AAITargetPoint*> RoomTargetPoints;
 
 };

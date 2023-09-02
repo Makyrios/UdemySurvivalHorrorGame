@@ -203,7 +203,7 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::Interact()
 {
-	AActor* HitActor = LineTrace(TraceLength);
+	AActor* HitActor = LineTrace(TraceLength, ETraceType::Interact);
 	if (IInteractable* InteractActor = Cast<IInteractable>(HitActor))
 	{
 		InteractActor->Interact();
@@ -217,7 +217,11 @@ void APlayerCharacter::Interact()
 
 void APlayerCharacter::StartGrab()
 {
-	AActor* HitActor = LineTrace(TraceLength);
+	AActor* HitActor = LineTrace(TraceLength, ETraceType::Grab);
+	if (HitActor == nullptr)
+	{
+		return;
+	}
 	if (IGrabbable* InteractActor = Cast<IGrabbable>(HitActor))
 	{
 		GrabbedActor = InteractActor;
@@ -302,19 +306,15 @@ void APlayerCharacter::PickupItem()
 {
 	if (CurrentPickupItems.Num() > 0)
 	{
-		// If player looking at an interactable actor, then interacting with it will be prioritized
+		// If player looking at an interactable or grabbable actor, then interacting with it will be prioritized
 		// Otherwise pickup actor
-		if (Cast<IInteractable>(LineTrace(TraceLength)))
+		if (Cast<IInteractable>(LineTrace(TraceLength, ETraceType::Interact)))
 		{
-			//if (APlayerController* PlayerContr = Cast<APlayerController>(Controller))
-			//{
-			//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerContr->GetLocalPlayer()))
-			//	{
-			//		Subsystem->RemoveMappingContext(PickupItemMappingContext);
-			//		//Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			//	}
-			//}
 			Interact();
+		}
+		else if (Cast<IGrabbable>(LineTrace(TraceLength, ETraceType::Grab)))
+		{
+			StartGrab();
 		}
 		else
 		{
@@ -392,15 +392,24 @@ void APlayerCharacter::ToggleCamera()
 	}
 }
 
-AActor* APlayerCharacter::LineTrace(float Length)
+AActor* APlayerCharacter::LineTrace(float Length, ETraceType Type)
 {
+	ECollisionChannel Channel;
+	if (Type == ETraceType::Interact)
+	{
+		Channel = ECollisionChannel::ECC_GameTraceChannel1;
+	}
+	else if (Type == ETraceType::Grab)
+	{
+		Channel = ECollisionChannel::ECC_GameTraceChannel2;
+	}
 	FHitResult HitResult;
 	FVector Start = CameraComponent->GetComponentLocation();
 	FVector End = Start + CameraComponent->GetForwardVector() * Length;
 	FCollisionQueryParams Params;
 	Params.TraceTag = "Trace";
 	GetWorld()->DebugDrawTraceTag = "Trace";
-	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, Channel, Params);
 
 	return HitResult.GetActor();
 }
@@ -455,9 +464,7 @@ void APlayerCharacter::UpdateDOF()
 		FVector Location = { HitResult.Location.X, HitResult.Location.Y, HitResult.Location.Z };
 		float FocalDistance = (Location - Start).Size();
 		GetCameraComponent()->PostProcessSettings.DepthOfFieldFocalDistance = FocalDistance;
-		UE_LOG(LogTemp, Display, TEXT("Focal Distance: %f"), FocalDistance);
 		GetCameraComponent()->PostProcessSettings.DepthOfFieldDepthBlurRadius = 350 / (FocalDistance);
-		UE_LOG(LogTemp, Display, TEXT("%f"), GetCameraComponent()->PostProcessSettings.DepthOfFieldDepthBlurRadius);
 	}
 	else
 	{
@@ -502,7 +509,6 @@ void APlayerCharacter::PlayFootstep()
 
 void APlayerCharacter::LeanCamera(float Amount)
 {
-	UE_LOG(LogTemp, Display, TEXT("%f"), Amount);
 	if (bIsLeaningLeft)
 	{
 		TRange<float> CurveRange {0, 1};

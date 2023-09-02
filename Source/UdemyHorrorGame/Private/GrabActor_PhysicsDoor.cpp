@@ -10,10 +10,10 @@ AGrabActor_PhysicsDoor::AGrabActor_PhysicsDoor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	StaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	StaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Ignore);
 
 	DoorStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Door Static mesh"));
-	DoorStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	DoorStaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
 	DoorStaticMesh->AttachToComponent(StaticMesh, FAttachmentTransformRules::KeepRelativeTransform);
 	DoorStaticMesh->SetSimulatePhysics(true);
 
@@ -42,12 +42,12 @@ void AGrabActor_PhysicsDoor::Grab()
 {
 	Super::Grab();
 
-
 }
 
 void AGrabActor_PhysicsDoor::Release()
 {
 	Super::Release();
+
 }
 
 void AGrabActor_PhysicsDoor::MoveDoor(FVector Force)

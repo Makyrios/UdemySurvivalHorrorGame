@@ -20,6 +20,12 @@ class IGrabbable;
 class UTimelineComponent;
 class UMainHUDWidget;
 
+enum ETraceType
+{
+	Interact,
+	Grab
+};
+
 UCLASS()
 class UDEMYHORRORGAME_API APlayerCharacter : public ACharacter
 {
@@ -259,7 +265,7 @@ private:
 	void ZoomCameraIn();
 	void ZoomCameraOut();
 
-	AActor* LineTrace(float Length);
+	AActor* LineTrace(float Length, ETraceType Type);
 
 	void HeadBob();
 	void UpdateDOF();
