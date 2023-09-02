@@ -105,8 +105,6 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 float UFlashlightComponent::GetCurrentBatteryLevel() const
 {
-	ACharacter* Act = UGameplayStatics::GetPlayerCharacter(this, 0);
-	Act->SetActorEnableCollision(true);
 	return CurrentBatteryLevel;
 }
 

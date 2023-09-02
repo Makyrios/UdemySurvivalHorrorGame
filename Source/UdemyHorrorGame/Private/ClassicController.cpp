@@ -30,6 +30,8 @@ void AClassicController::OnPossess(APawn* InPawn)
 			BehaviorComp->StartTree(*(Bot->BotBehavior));
 		}
 	}
+	
+	BlackboardComp->SetValueAsBool(FName("playJumpscare"), true);
 }
 
 void AClassicController::OnUnPossess()
@@ -51,11 +53,14 @@ void AClassicController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
+			BlackboardComp->ClearValue(FName("investigateLocation"));
 			BlackboardComp->SetValueAsObject(FName("playerActor"), Actor);
 		}
 		else
 		{
-			BlackboardComp->SetValueAsObject(FName("playerActor"), nullptr);
+			BlackboardComp->SetValueAsVector(FName("investigateLocation"), Stimulus.StimulusLocation);
+			DrawDebugSphere(GetWorld(), Stimulus.StimulusLocation, 50, 20, FColor::Red, true);
+			BlackboardComp->ClearValue(FName("playerActor"));
 		}
 	}
 }
