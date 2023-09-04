@@ -11,6 +11,8 @@ class UDEMYHORRORGAME_API AClassic : public ACharacter
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, Category = Animations)
+	class UAnimMontage* CatchAnimMontage;
 
 public:
 	UPROPERTY(EditAnywhere, Category = AI)
@@ -18,6 +20,9 @@ public:
 
 	// Sets default values for this character's properties
 	AClassic();
+
+
+	void CatchTarget(AActor* Target);
 
 protected:
 	// Called when the game starts or when spawned

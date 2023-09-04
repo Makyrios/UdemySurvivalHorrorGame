@@ -14,8 +14,15 @@ class UDEMYHORRORGAME_API AHG_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	TSubclassOf<UUserWidget> GameOverWidget;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	int InventorySlots = 8;
 	
+	void GameOver();
+
+private:
+	void OnPossess(APawn* PossessedPawn) override;
 };

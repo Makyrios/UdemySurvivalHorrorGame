@@ -18,6 +18,8 @@ class UDEMYHORRORGAME_API AClassicController : public AAIController
 	//UPROPERTY(VisibleAnywhere, Category = Components)
 	//class UAIPerceptionComponent* PerceptionComponent;
 
+	
+
 public:
 	AClassicController();
 

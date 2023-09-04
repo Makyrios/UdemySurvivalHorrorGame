@@ -41,9 +41,9 @@ public:
 
 	void Initialize(int ind);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void RollNumberUp();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void RollNumberDown();
 
 	void ToggleArrows();

@@ -24,6 +24,7 @@
 #include "HG_GameStateBase.h"
 #include "Components/Image.h"
 #include <Perception/AISense_Hearing.h>
+#include <Classic.h>
 
 
 // Sets default values
@@ -407,12 +408,10 @@ void APlayerCharacter::ToggleCamera()
 
 AActor* APlayerCharacter::LineTrace(float Length, ETraceType Type)
 {
-	ECollisionChannel Channel;
-	if (Type == ETraceType::Interact)
-	{
-		Channel = ECollisionChannel::ECC_GameTraceChannel1;
-	}
-	else if (Type == ETraceType::Grab)
+	// Interact channel by default
+	ECollisionChannel Channel = ECollisionChannel::ECC_GameTraceChannel1;
+	// Grab channel
+	if (Type == ETraceType::Grab)
 	{
 		Channel = ECollisionChannel::ECC_GameTraceChannel2;
 	}
@@ -589,6 +588,29 @@ void APlayerCharacter::FinishLeanCamera()
 	}
 }
 
+void APlayerCharacter::RotateToEnemy(AActor* Enemy)
+{
+	if (Enemy == nullptr)
+	{
+		return;
+	}
+	FRotator RotationToEnemy = (Enemy->GetActorLocation() - GetActorLocation()).Rotation();
+	FTimerDelegate TimerCallback;
+	TimerCallback.BindUFunction(this, FName("InterpolateRotation"), RotationToEnemy);
+	GetWorld()->GetTimerManager().SetTimer(EnemyRotationTimerHandle, TimerCallback, 0.01, true);
+}
+
+void APlayerCharacter::InterpolateRotation(FRotator RotationToEnemy)
+{
+	FRotator FinalRotation = FMath::RInterpTo(GetActorRotation(), RotationToEnemy, UGameplayStatics::GetWorldDeltaSeconds(this), 30);
+	PlayerController->SetControlRotation(FinalRotation);
+	if (PlayerController->GetControlRotation().Equals(RotationToEnemy))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(EnemyRotationTimerHandle);
+	}
+}
+
+
 void APlayerCharacter::ZoomCameraIn()
 {
 	if (CameraWidget->IsInViewport())
@@ -655,6 +677,36 @@ void APlayerCharacter::OnExitLockView()
 	}
 }
 
+void APlayerCharacter::DamagePlayer(float Damage, AActor* DamageCauser)
+{
+	GetHealthComponent()->ChangeHealth(-Damage, DamageCauser);
+}
+
+void APlayerCharacter::GetCaughtByEnemy(AActor* Enemy)
+{
+	// Death by AI
+	if (Enemy != nullptr)
+	{
+		if (Enemy->IsA<AClassic>())
+		{
+			Die();
+			RotateToEnemy(Enemy);
+		}
+	}
+	else
+	{
+		Die();
+	}
+}
+
+void APlayerCharacter::Die()
+{
+	DisableInput(PlayerController);
+	GetCharacterMovement()->DisableMovement();
+	PlayerController->SetIgnoreLookInput(true);
+	ToggleHUD();
+}
+
 
 void APlayerCharacter::Initialize()
 {
@@ -717,6 +769,7 @@ void APlayerCharacter::Initialize()
 		FinishFunc.BindUObject(this, &APlayerCharacter::FinishLeanCamera);
 		LeaningTimelineComponent->SetTimelineFinishedFunc(FinishFunc);
 	}
+	HealthComponent->OnPlayerDieEvent.AddUObject(this, &APlayerCharacter::GetCaughtByEnemy);
 
 	//Flashlight component
 	FlashlightComponent->Initialize(this);

@@ -15,10 +15,17 @@ UHealthComponent::UHealthComponent()
 	BloodScreenMaterialCollection = LoadObject<UMaterialParameterCollection>(NULL, TEXT("/Script/Engine.MaterialParameterCollection'/Game/Materials/MPC_BloodScreen.MPC_BloodScreen'"));
 }
 
-void UHealthComponent::ChangeHealth(float Amount)
+void UHealthComponent::ChangeHealth(float Amount, AActor* DamageCauser)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth + Amount, MinHealth, MaxHealth);
 	UpdateBloodScreen();
+	if (CurrentHealth <= 0)
+	{
+		if (OnPlayerDieEvent.IsBound())
+		{
+			OnPlayerDieEvent.Broadcast(DamageCauser);
+		}
+	}
 }
 
 void UHealthComponent::UpdateBloodScreen()

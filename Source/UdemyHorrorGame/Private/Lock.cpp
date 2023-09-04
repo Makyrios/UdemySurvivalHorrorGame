@@ -109,6 +109,7 @@ void ALock::EnterLockView()
 	PlayerContr->SetViewTargetWithBlend(Camera->GetOwner(), 0.6);
 	PlayerContr->SetIgnoreLookInput(true);
 	PlayerContr->bShowMouseCursor = true;
+	PlayerContr->SetInputMode(FInputModeGameAndUI());
 	PlayerCharacter->GetCharacterMovement()->DisableMovement();
 	PlayerCharacter->bCanOpenInventory = false;
 	PlayerCharacter->ToggleHUD();
@@ -126,6 +127,7 @@ void ALock::ExitLockView()
 	PlayerContr->SetViewTargetWithBlend(PlayerCharacter, 0.6);
 	PlayerContr->bShowMouseCursor = false;
 	PlayerContr->ResetIgnoreLookInput();
+	PlayerContr->SetInputMode(FInputModeGameOnly());
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	PlayerCharacter->bCanOpenInventory = true;
 	PlayerCharacter->ToggleHUD();
@@ -155,7 +157,7 @@ void ALock::OnDialRoll()
 		if (UnlockAnimation != nullptr)
 		{
 			LockMesh->PlayAnimation(UnlockAnimation, false);
-			// Exit lock view after unlock animatin finished
+			// Exit lock view after unlock animation finished
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() 
 				{ 

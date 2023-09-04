@@ -219,12 +219,15 @@ public:
 	void OnEnterLockView();
 	void OnExitLockView();
 
+	void DamagePlayer(float Damage, AActor* DamageCauser);
+
 private:
 	FVector2D LookAxis;
 	IGrabbable* GrabbedActor;
 	FOnTimelineFloat CrouchTimelineFloat;
 	FOnTimelineFloat FootstepTimelineFloat;
 	FOnTimelineFloat LeaningTimelineFloat;
+	FTimerHandle EnemyRotationTimerHandle;
 	APlayerController* PlayerController;
 	TArray<class APickupActor_Main*> CurrentPickupItems;
 
@@ -283,4 +286,18 @@ private:
 	UFUNCTION()
 	void FinishLeanCamera();
 
+	/// <summary>
+	/// Disable movement and input
+	/// </summary>
+	void Die();
+	void GetCaughtByEnemy(AActor* Enemy);
+	/// <summary>
+	/// Rotate actor to the enemy, needs to be called in a loop
+	/// </summary>
+	/// <param name="Enemy">Actor rotate to</param>
+	/// <returns>Finished rotation</returns>
+	void RotateToEnemy(AActor* Enemy);
+
+	UFUNCTION()
+	void InterpolateRotation(FRotator RotationToEnemy);
 };

@@ -59,11 +59,11 @@ void ALockDial::Initialize(int ind)
 
 	if (TopArrow != nullptr)
 	{
-		TopArrow->ArrowButton->OnClicked.AddDynamic(this, &ALockDial::RollNumberUp);
+		TopArrow->ArrowButton->OnPressed.AddDynamic(this, &ALockDial::RollNumberUp);
 	}
 	if (BottomArrow != nullptr)
 	{
-		BottomArrow->ArrowButton->OnClicked.AddDynamic(this, &ALockDial::RollNumberDown);
+		BottomArrow->ArrowButton->OnPressed.AddDynamic(this, &ALockDial::RollNumberDown);
 	}
 
 	// Set random numbers on dial on spawn
@@ -86,6 +86,7 @@ void ALockDial::Initialize(int ind)
 
 void ALockDial::RollNumberUp()
 {
+	UE_LOG(LogTemp, Display, TEXT("Roll up"));
 	if (bCanRotate)
 	{
 		bCanRotate = false;
@@ -124,7 +125,7 @@ void ALockDial::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 }
 
 // Called every frame
@@ -132,6 +133,7 @@ void ALockDial::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UE_LOG(LogTemp, Display, TEXT("Can Rotate: %s"), bCanRotate ? TEXT("TRUE") : TEXT("FALSE"));
 }
 
 void ALockDial::Rotate(float Value)
