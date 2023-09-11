@@ -133,7 +133,6 @@ void ALockDial::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Display, TEXT("Can Rotate: %s"), bCanRotate ? TEXT("TRUE") : TEXT("FALSE"));
 }
 
 void ALockDial::Rotate(float Value)

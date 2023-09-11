@@ -33,7 +33,7 @@ void AGrabActor_PhysicsDoor::Tick(float DeltaTime)
 	if (bIsGrabbed)
 	{
 		FVector2D LookAxis = PlayerCharacter->GetLookAxis();
-		FVector Force(LookAxis.Y * ForceMultiplier * -1, LookAxis.X * ForceMultiplier, 0);
+		FVector Force(LookAxis.Y * ForceMultiplier * -1, LookAxis.X * ForceMultiplier, 20);
 		MoveDoor(Force);
 	}
 }
@@ -53,11 +53,13 @@ void AGrabActor_PhysicsDoor::Release()
 void AGrabActor_PhysicsDoor::MoveDoor(FVector Force)
 {
 	FVector DoorDirection = GetActorForwardVector();
-	FVector PlayerDirection = PlayerCharacter->GetActorForwardVector();
-	float DotProduct = FVector::DotProduct(DoorDirection, PlayerDirection);
-	if (DotProduct < 0)
+	FVector DoorToPlayerDirection = (PlayerCharacter->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	float DotProduct = FVector::DotProduct(DoorDirection, DoorToPlayerDirection);
+	if (DotProduct > 0)
 	{
 		Force = -Force;
 	}
+	float DoorRotation = GetActorRotation().Yaw;
+	Force = Force.RotateAngleAxis(DoorRotation, FVector::ZAxisVector);
 	DoorStaticMesh->AddForce(Force);
 }
