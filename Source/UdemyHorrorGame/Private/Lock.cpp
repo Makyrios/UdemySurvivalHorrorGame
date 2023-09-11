@@ -68,12 +68,15 @@ void ALock::Initialize()
 	PlayerContr = UGameplayStatics::GetPlayerController(this, 0);
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
-	PlayerCharacter->PressedReturnEvent.AddUObject(this, &ALock::ExitLockView);
-	PlayerCharacter->LMBPressedEvent.AddUObject(this, &ALock::MouseClickStarted);
-	PlayerCharacter->LMBReleasedEvent.AddUObject(this, &ALock::MouseClickCompleted);
+	if (PlayerCharacter != nullptr)
+	{
+		PlayerCharacter->PressedReturnEvent.AddUObject(this, &ALock::ExitLockView);
+		PlayerCharacter->LMBPressedEvent.AddUObject(this, &ALock::MouseClickStarted);
+		PlayerCharacter->LMBReleasedEvent.AddUObject(this, &ALock::MouseClickCompleted);
 
-	OnEnterLockView.AddUObject(PlayerCharacter, &APlayerCharacter::OnEnterLockView);
-	OnExitLockView.AddUObject(PlayerCharacter, &APlayerCharacter::OnExitLockView);
+		OnEnterLockView.AddUObject(PlayerCharacter, &APlayerCharacter::OnEnterLockView);
+		OnExitLockView.AddUObject(PlayerCharacter, &APlayerCharacter::OnExitLockView);
+	}
 }
 
 void ALock::CreateDials()

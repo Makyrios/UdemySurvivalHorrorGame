@@ -47,13 +47,16 @@ void ASecurityCameraController::BeginPlay()
 		SecurityCameras.Add(Cast<ASecurityCamera>(Actor));
 	}
 	// Set input
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerCharacter->InputComponent))
+	if (PlayerCharacter != nullptr)
 	{
-		EnhancedInputComponent->BindAction(ShowNextCameraAction, ETriggerEvent::Completed, this, &ASecurityCameraController::ShowNextCamera);
-		EnhancedInputComponent->BindAction(ShowPrevCameraAction, ETriggerEvent::Completed, this, &ASecurityCameraController::ShowPrevCamera);
-	}
+		if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerCharacter->InputComponent))
+		{
+			EnhancedInputComponent->BindAction(ShowNextCameraAction, ETriggerEvent::Completed, this, &ASecurityCameraController::ShowNextCamera);
+			EnhancedInputComponent->BindAction(ShowPrevCameraAction, ETriggerEvent::Completed, this, &ASecurityCameraController::ShowPrevCamera);
+		}
 
-	PlayerCharacter->PressedReturnEvent.AddUObject(this, &ASecurityCameraController::ExitCameraController);
+		PlayerCharacter->PressedReturnEvent.AddUObject(this, &ASecurityCameraController::ExitCameraController);
+	}
 }
 
 // Called every frame
