@@ -7,6 +7,9 @@
 #include "PlayerCharacter.h"
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ClassicController.h"
+#include "Perception/AIPerceptionComponent.h"
+
 
 // Sets default values
 AHideActor::AHideActor()
@@ -21,14 +24,28 @@ AHideActor::AHideActor()
 	PlayerPosition->SetupAttachment(RootComponent);
 	ExitPosition = CreateDefaultSubobject<UArrowComponent>(TEXT("Exit Position Arrow"));
 	ExitPosition->SetupAttachment(RootComponent);
+	AIPosition = CreateDefaultSubobject<UArrowComponent>(TEXT("AI Position Arrow"));
+	AIPosition->SetupAttachment(RootComponent);
 
 
 }
 
 bool AHideActor::Interact()
 {
+	if (!bCanInteract) return false;
+	bCanInteract = false;
+
+	if (ClassicContr == nullptr)
+	{
+		ClassicContr = Cast<AClassicController>(UGameplayStatics::GetActorOfClass(this, AClassicController::StaticClass()));
+		if (ClassicContr == nullptr) return false;
+	}
+
+	PlayerCharacter->bCanOpenInventory = false;
+
 	if (!PlayerCharacter->bIsHiding)
 	{
+		ClassicContr->DidEnemySee(this);
 		PlayerCharacter->SetActorEnableCollision(false);
 		GetWorld()->GetTimerManager().SetTimer(MoveCharTimerHandle, this, &AHideActor::MoveCharacter, UGameplayStatics::GetWorldDeltaSeconds(this), true);
 		PlayerCharacter->GetCharacterMovement()->DisableMovement();
@@ -41,16 +58,22 @@ bool AHideActor::Interact()
 	return true;
 }
 
+void AHideActor::EnemyFound()
+{
+}
+
 // Called when the game starts or when spawned
 void AHideActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	ClassicContr = Cast<AClassicController>(UGameplayStatics::GetActorOfClass(this, AClassicController::StaticClass()));
 }
 
 void AHideActor::MoveCharacter()
 {
+	// Hide
 	if (!PlayerCharacter->bIsHiding)
 	{
 		FVector CurrentMove = FMath::VInterpConstantTo(PlayerCharacter->GetActorLocation(), PlayerPosition->GetComponentLocation(),
@@ -64,6 +87,7 @@ void AHideActor::MoveCharacter()
 			PlayerCharacter->bCanOpenInventory = false;
 		}
 	}
+	// Exit hiding spot
 	else
 	{
 		FVector CurrentMove = FMath::VInterpConstantTo(PlayerCharacter->GetActorLocation(), ExitPosition->GetComponentLocation(),
@@ -84,6 +108,8 @@ void AHideActor::FinishedMoving()
 {
 	GetWorld()->GetTimerManager().ClearTimer(MoveCharTimerHandle);
 	PlayerCharacter->bIsHiding = !PlayerCharacter->bIsHiding;
+	ClassicContr->PerceptionComponent->ForgetAll();
+	ClassicContr->LeftHidingSpot();
 	OnFinishedMoving.Broadcast();
 }
 

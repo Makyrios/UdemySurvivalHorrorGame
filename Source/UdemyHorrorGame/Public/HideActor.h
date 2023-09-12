@@ -15,17 +15,19 @@ class UDEMYHORRORGAME_API AHideActor : public AActor, public IInteractable
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, Category = Components)
+	class UArrowComponent* PlayerPosition;
+	UPROPERTY(VisibleAnywhere, Category = Components)
+	class UArrowComponent* ExitPosition;
+	UPROPERTY(VisibleAnywhere, Category = Components)
+	class UArrowComponent* AIPosition;
+
 	UPROPERTY(EditDefaultsOnly, Category = Locker)
 	float InterpolationSpeed = 1000;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Components)
 	UStaticMeshComponent* StaticMesh;
-
-	UPROPERTY(VisibleAnywhere, Category = Components)
-	class UArrowComponent* PlayerPosition;
-	UPROPERTY(VisibleAnywhere, Category = Components)
-	class UArrowComponent* ExitPosition;
 
 	FOnFinishedMoving OnFinishedMoving;
 	
@@ -34,6 +36,8 @@ public:
 	AHideActor();
 
 	bool Interact() override;
+
+	virtual void EnemyFound();
 
 protected:
 	bool bCanInteract = true;
@@ -52,7 +56,10 @@ public:
 
 protected:
 	class APlayerCharacter* PlayerCharacter;
+	class AClassicController* ClassicContr;
+
 
 private:
 	FTimerHandle MoveCharTimerHandle;
+
 };

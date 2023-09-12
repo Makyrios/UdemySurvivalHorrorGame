@@ -5,6 +5,10 @@
 
 #include "HideActor_Locker.h"
 #include "PlayerCharacter.h"
+#include <Kismet/GameplayStatics.h>
+#include "ClassicController.h"
+#include "Perception/AIPerceptionComponent.h"
+
 
 AHideActor_Locker::AHideActor_Locker()
 {
@@ -33,18 +37,21 @@ void AHideActor_Locker::BeginPlay()
 
 bool AHideActor_Locker::Interact()
 {
-	if (!bCanInteract) return false;
-	PlayerCharacter->bCanOpenInventory = false;
-	bCanInteract = false;
 	DoorTimeline->Play();
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() { Super::Interact(); }, DoorTimeline->GetPlayRate() - 0.5f, false);
 	return true;
 }
 
+void AHideActor_Locker::EnemyFound()
+{
+	DoorTimeline->Play();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {  }, DoorTimeline->GetPlayRate() - 0.5f, false);
+}
+
 void AHideActor_Locker::OpenDoor(float Value)
 {
-	UE_LOG(LogTemp, Display, TEXT("Value: %f"), Value);
 	DoorStaticMesh->SetRelativeRotation(FRotator(0, Value, 0));
 }
 
@@ -53,7 +60,7 @@ void AHideActor_Locker::OnFinishedMove_Event()
 {
 	DoorTimeline->Reverse();
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() 
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]() 
 		{
 			bCanInteract = true;
 		}, 

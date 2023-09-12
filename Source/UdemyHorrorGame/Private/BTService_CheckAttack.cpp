@@ -21,8 +21,10 @@ void UBTService_CheckAttack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	FVector Start = ControlledPawn->GetActorLocation();
 	FVector End = Start + ControlledPawn->GetActorForwardVector() * AttackDistance;
 	bool bWasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+	//UE_LOG(LogTemp, Display, TEXT("%s"), bWasHit ? TEXT("True") : TEXT("False"));
 	if (FVector::Distance(ControlledPawn->GetActorLocation(), Player->GetActorLocation()) < AttackDistance && !bWasHit)
 	{
+		//UE_LOG(LogTemp, Display, TEXT("Object: %s"), *HitResult.GetActor()->GetActorNameOrLabel());
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName("canAttackPlayer"), true);
 	}
 	else

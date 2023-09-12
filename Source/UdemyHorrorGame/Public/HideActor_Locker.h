@@ -30,6 +30,7 @@ public:
 	AHideActor_Locker();
 
 	bool Interact() override;
+	void EnemyFound() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Components)
